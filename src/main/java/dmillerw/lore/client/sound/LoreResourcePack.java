@@ -24,8 +24,13 @@ public class LoreResourcePack extends AbstractResourcePack {
 	}
 
 	@Override
-	protected InputStream getInputStreamByName(String name) throws IOException {
-		return new BufferedInputStream(new FileInputStream(new File(this.resourcePackFile, this.name + ".ogg")));
+	protected InputStream getInputStreamByName(String name) {
+		try {
+			return new BufferedInputStream(new FileInputStream(new File(this.resourcePackFile, this.name + ".ogg")));
+		} catch (IOException ex) {
+			ex.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override
@@ -34,7 +39,7 @@ public class LoreResourcePack extends AbstractResourcePack {
 	}
 
 	@Override
-	public InputStream getInputStream(ResourceLocation location) throws IOException {
+	public InputStream getInputStream(ResourceLocation location) {
 		return getInputStreamByName(location.getResourcePath().replace("sounds/", ""));
 	}
 
