@@ -2,6 +2,7 @@ package dmillerw.lore.lore;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import dmillerw.lore.client.sound.SoundLoader;
 
 import java.util.Map;
 import java.util.Set;
@@ -36,12 +37,12 @@ public class LoreData {
 	public boolean global = false;
 	public String globalTitle;
 	public String globalLore;
-	public String globalSound;
+	public SoundLoader globalSound;
 
 	public Set<Integer> contents = Sets.newHashSet();
 	public Map<Integer, String> title = Maps.newHashMap();
 	public Map<Integer, String> lore = Maps.newHashMap();
-	public Map<Integer, String> sound = Maps.newHashMap();
+	public Map<Integer, SoundLoader> sound = Maps.newHashMap();
 
 	public boolean addLore(DeserializedLore data) {
 		// Obviously different pages can't be merged
@@ -69,11 +70,11 @@ public class LoreData {
 			contents.add(data.dimension);
 			title.put(data.dimension, data.title);
 			lore.put(data.dimension, data.lore);
-			sound.put(data.dimension, data.sound);
+			sound.put(data.dimension, new SoundLoader(data.sound));
 		} else {
 			globalTitle = data.title;
 			globalLore = data.lore;
-			globalSound = data.sound;
+			globalSound = new SoundLoader(data.sound);
 		}
 
 		return true;
@@ -91,7 +92,7 @@ public class LoreData {
 		return global ? globalLore : lore.get(dimension);
 	}
 
-	public String getSound(int dimension) {
+	public SoundLoader getSound(int dimension) {
 		return global ? globalSound : sound.get(dimension);
 	}
 

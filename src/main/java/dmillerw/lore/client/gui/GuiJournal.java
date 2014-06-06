@@ -180,6 +180,8 @@ public class GuiJournal extends GuiScreen {
 					drawY = (((page - 1) / 4) * SLOT_GAP);
 				}
 
+				data.getSound(dimension).play();
+
 				if (inBounds(drawX, drawY, 16, 16, mouseX, mouseY)) {
 					currentLore.clear();
 					selectedLore = page;

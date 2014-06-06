@@ -31,6 +31,7 @@ public class LoreExpansion {
 
 	private static final String CONFIG_FOLDER = "LoreExpansion";
 	private static final String LORE_FOLDER = "lore";
+	private static final String AUDIO_FOLDER = "audio";
 
 	public static final Logger logger = LogManager.getLogger("Lore Expansion");
 
@@ -39,6 +40,9 @@ public class LoreExpansion {
 
 	@SidedProxy(serverSide = "dmillerw.lore.core.proxy.CommonProxy", clientSide = "dmillerw.lore.core.proxy.ClientProxy")
 	public static CommonProxy proxy;
+
+	public static File loreFolder;
+	public static File audioFolder;
 
 	public static Item loreScrap;
 	public static Item journal;
@@ -51,9 +55,13 @@ public class LoreExpansion {
 		journal = new ItemJournal().setUnlocalizedName("journal");
 		GameRegistry.registerItem(journal, "journal");
 
-		File loreFolder = new File(event.getModConfigurationDirectory(), CONFIG_FOLDER + "/" + LORE_FOLDER);
+		loreFolder = new File(event.getModConfigurationDirectory(), CONFIG_FOLDER + "/" + LORE_FOLDER);
+		audioFolder = new File(loreFolder, AUDIO_FOLDER);
 		if (!loreFolder.exists()) {
 			loreFolder.mkdirs();
+		}
+		if (!audioFolder.exists()) {
+			audioFolder.mkdir();
 		}
 
 		for (File file : loreFolder.listFiles()) {
