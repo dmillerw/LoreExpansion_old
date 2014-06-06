@@ -70,6 +70,8 @@ public class LoreExpansion {
 
 		FMLCommonHandler.instance().bus().register(new NetworkEventHandler());
 		FMLCommonHandler.instance().bus().register(new PlayerTickHandler());
+
+		proxy.preInit(event);
 	}
 
 	@Mod.EventHandler
