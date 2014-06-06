@@ -24,7 +24,7 @@ public class LoreResourcePack extends AbstractResourcePack {
 	}
 
 	@Override
-	protected InputStream getInputStreamByName(String name) throws FileNotFoundException {
+	protected InputStream getInputStreamByName(String name) throws IOException {
 		return new BufferedInputStream(new FileInputStream(new File(this.resourcePackFile, this.name + ".ogg")));
 	}
 
@@ -34,7 +34,7 @@ public class LoreResourcePack extends AbstractResourcePack {
 	}
 
 	@Override
-	public InputStream getInputStream(ResourceLocation location) throws FileNotFoundException {
+	public InputStream getInputStream(ResourceLocation location) throws IOException {
 		return getInputStreamByName(location.getResourcePath().replace("sounds/", ""));
 	}
 
