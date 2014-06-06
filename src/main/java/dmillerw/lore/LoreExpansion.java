@@ -24,7 +24,7 @@ import java.io.File;
 /**
  * @author dmillerw
  */
-@Mod(modid = "LoreExp", name = "Lore Expansion", version = "1.0.0")
+@Mod(modid = "LoreExp", name = "Lore Expansion", version = "1.0.0", dependencies = "required-after:Forge@[10.12.1.1112,)")
 public class LoreExpansion {
 
 	private static final String CONFIG_FOLDER = "LoreExpansion";
