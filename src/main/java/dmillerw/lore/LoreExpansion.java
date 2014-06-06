@@ -8,6 +8,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import dmillerw.lore.core.GuiHandler;
+import dmillerw.lore.core.handler.PlayerTickHandler;
 import dmillerw.lore.core.proxy.CommonProxy;
 import dmillerw.lore.item.ItemJournal;
 import dmillerw.lore.item.ItemLoreScrap;
@@ -68,6 +69,7 @@ public class LoreExpansion {
 		PacketHandler.init();
 
 		FMLCommonHandler.instance().bus().register(new NetworkEventHandler());
+		FMLCommonHandler.instance().bus().register(new PlayerTickHandler());
 	}
 
 	@Mod.EventHandler
