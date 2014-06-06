@@ -10,6 +10,8 @@ import dmillerw.lore.lore.PlayerHandler;
 import dmillerw.lore.network.PacketHandler;
 import dmillerw.lore.network.PacketSyncLore;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ChatComponentText;
+import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,7 @@ public class PlayerTickHandler {
 
 	@SubscribeEvent
 	public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+		boolean notifiedThisTick = false;
 		if (event.phase == TickEvent.Phase.START && event.side == Side.SERVER) {
 			if (!event.player.capabilities.isCreativeMode) {
 				for (int i=0; i<event.player.inventory.getSizeInventory(); i++) {
@@ -47,6 +50,11 @@ public class PlayerTickHandler {
 							}
 							PlayerHandler.setLore(event.player, list);
 							PacketHandler.INSTANCE.sendToAll(new PacketSyncLore(event.player, list));
+
+							if (!notifiedThisTick) {
+								event.player.addChatComponentMessage(new ChatComponentText("You've discovered a new lore page. Press " + Keyboard.getKeyName(KeyHandler.INSTANCE.key.getKeyCode()) + " to open your journal"));
+								notifiedThisTick = true;
+							}
 
 							event.player.inventory.setInventorySlotContents(i, null);
 							event.player.inventory.markDirty();

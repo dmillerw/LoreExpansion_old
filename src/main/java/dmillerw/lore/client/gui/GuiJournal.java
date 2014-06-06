@@ -205,6 +205,11 @@ public class GuiJournal extends GuiScreen {
 	protected void keyTyped(char key, int code) {
 		super.keyTyped(key, code);
 
+		if (code == mc.gameSettings.keyBindInventory.getKeyCode()) {
+			mc.displayGuiScreen(null);
+			mc.setIngameFocus();
+		}
+
 		if (code == Keyboard.KEY_UP) {
 			scroll(-1);
 		}

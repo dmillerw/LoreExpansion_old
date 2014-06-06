@@ -1,4 +1,4 @@
-package dmillerw.lore.client.handler;
+package dmillerw.lore.core.handler;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.ClientRegistry;
@@ -15,6 +15,8 @@ import org.lwjgl.input.Keyboard;
  * @author dmillerw
  */
 public class KeyHandler {
+
+	public static final KeyHandler INSTANCE = new KeyHandler();
 
 	public KeyBinding key = new KeyBinding("Lore Journal", Keyboard.KEY_L, "key.categories.misc");
 
