@@ -87,6 +87,16 @@ public class GuiJournal extends GuiScreen {
 			}
 		}
 
+		// ARROWS
+		GL11.glColor4f(1, 1, 1, 1);
+		mc.getTextureManager().bindTexture(JOURNAL_RIGHT);
+		if (selectedLore >= 0 && scrollIndex > 0) {
+			drawTexturedModalRect(left + XSIZE / 2 + 78, top + 37, 168, 37, 13, 6);
+		}
+		if (selectedLore >= 0 && currentLore.size() - LORE_ROW_COUNT > scrollIndex) {
+			drawTexturedModalRect(left + XSIZE / 2 + 78, top + 203, 168, 203, 13, 6);
+		}
+
 		// LORE ICON BACKGROUNDS
 		GL11.glColor4f(1, 1, 1, 1);
 		mc.getTextureManager().bindTexture(JOURNAL_LEFT);
@@ -158,6 +168,7 @@ public class GuiJournal extends GuiScreen {
 		int mouseY = (y - startY);
 		int dimension = FMLClientHandler.instance().getClient().theWorld.provider.dimensionId;
 
+		// LORE PICKING
 		for (int page : loreCache) {
 			LoreData data = LoreLoader.INSTANCE.getLore(page);
 
@@ -199,10 +210,18 @@ public class GuiJournal extends GuiScreen {
 				}
 			}
 		}
+
+		// SCROLLING
+		if (inBounds(left + XSIZE / 2 + 78, top + 37, 13, 16, x, y)) {
+			scroll(-1);
+		}
+		if (inBounds(left + XSIZE / 2 + 78, top + 203, 13, 16, x, y)) {
+			scroll(1);
+		}
 	}
 
 	public void onWheelScrolled(int wheel) {
-		scroll(wheel);
+		scroll(-wheel);
 	}
 
 	@Override
