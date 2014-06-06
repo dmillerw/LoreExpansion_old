@@ -1,5 +1,6 @@
 package dmillerw.lore.item;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import dmillerw.lore.LoreExpansion;
 import dmillerw.lore.core.TabLore;
 import dmillerw.lore.lore.LoreData;
@@ -88,7 +89,7 @@ public class ItemLoreScrap extends Item {
 	@Override
 	public void getSubItems(Item item, CreativeTabs tab, List list) {
 		for (LoreData data : LoreLoader.INSTANCE.getLore()) {
-			if (data != null) {
+			if (data != null && data.validForDimension(FMLClientHandler.instance().getClient().theWorld.provider.dimensionId)) {
 				list.add(new ItemStack(this, 1, data.page));
 			}
 		}
