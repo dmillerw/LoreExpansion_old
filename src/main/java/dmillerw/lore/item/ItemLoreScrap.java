@@ -10,6 +10,7 @@ import dmillerw.lore.network.PacketSyncLore;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
@@ -57,7 +58,7 @@ public class ItemLoreScrap extends Item {
 						list.add(stack.getItemDamage());
 					}
 					PlayerHandler.setLore(player, list);
-					PacketHandler.INSTANCE.sendToAll(new PacketSyncLore(player, list));
+					PacketHandler.INSTANCE.sendTo(new PacketSyncLore(player, list), (EntityPlayerMP) player);
 
 					player.addChatComponentMessage(new ChatComponentText("Added lore page #" + data.page));
 				}

@@ -3,7 +3,8 @@ package dmillerw.lore.lore;
 import dmillerw.lore.LoreExpansion;
 import net.minecraft.entity.player.EntityPlayer;
 
-import java.io.File;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +30,7 @@ public class PlayerHandler {
 
 	public static void setLore(EntityPlayer player, List<Integer> lore) {
 		playerLore.put(player.getCommandSenderName(), lore);
+		savePlayerLore(player);
 	}
 
 	public static File getFileForPlayer(EntityPlayer player) {
@@ -41,29 +43,33 @@ public class PlayerHandler {
 		return null;
 	}
 
-	public static File getBackupFileForPlayer(EntityPlayer player) {
-		try {
-			File directory = new File(player.worldObj.getSaveHandler().getWorldDirectory(), "players");
-			return new File(directory, player.getCommandSenderName() + ".loreback");
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return null;
-	}
-
 	public static void loadPlayerLore(EntityPlayer player) {
 		if (player != null && !player.worldObj.isRemote) {
 			try {
+				List<Integer> loaded = new ArrayList<Integer>();
 				File file = getFileForPlayer(player);
 
 				if (file != null && file.exists()) {
+					FileInputStream inputStream = new FileInputStream(file);
+					BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+					StringBuilder sb = new StringBuilder();
+					String line;
 
-				} else {
-					File backup = getBackupFileForPlayer(player);
-
-					if (file != null && file.exists()) {
-
+					while((line = reader.readLine()) != null) {
+						if (!line.isEmpty()) {
+							sb.append(line);
+						}
 					}
+
+					reader.close();
+
+					for (String str : sb.toString().split(";")) {
+						if (!str.isEmpty()) {
+							loaded.add(Integer.parseInt(str));
+						}
+					}
+
+					setLore(player, loaded);
 				}
 			} catch (Exception ex) {
 				LoreExpansion.logger.fatal(String.format("Failed to load lore data for %s", player.getCommandSenderName()));
@@ -72,10 +78,21 @@ public class PlayerHandler {
 		}
 	}
 
-	public static void savePlayerBaubles(EntityPlayer player) {
+	public static void savePlayerLore(EntityPlayer player) {
 		if (player != null && !player.worldObj.isRemote) {
 			try {
+				File file = getFileForPlayer(player);
+				List<Integer> list = getLore(player);
 
+				StringBuilder sb = new StringBuilder();
+				for (int i=0; i<list.size(); i++) {
+					sb.append(String.valueOf(list.get(i)));
+					sb.append(";");
+				}
+
+				FileOutputStream outputStream = new FileOutputStream(file);
+				outputStream.write(sb.toString().getBytes(Charset.forName("UTF-8")));
+				outputStream.close();
 			} catch (Exception exception1) {
 				LoreExpansion.logger.fatal(String.format("Failed to save lore data for %s", player.getCommandSenderName()));
 				exception1.printStackTrace();

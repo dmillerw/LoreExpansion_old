@@ -2,8 +2,8 @@ package dmillerw.lore.item;
 
 import dmillerw.lore.LoreExpansion;
 import dmillerw.lore.core.GuiHandler;
+import dmillerw.lore.core.TabLore;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -21,7 +21,7 @@ public class ItemJournal extends Item {
 		super();
 
 		setMaxStackSize(1);
-		setCreativeTab(CreativeTabs.tabMisc);
+		setCreativeTab(TabLore.TAB);
 	}
 
 	@Override

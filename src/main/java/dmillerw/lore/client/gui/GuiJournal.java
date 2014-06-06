@@ -68,7 +68,7 @@ public class GuiJournal extends GuiScreen {
 		int mouseY = (y - startY);
 		int dimension = FMLClientHandler.instance().getClient().theWorld.provider.dimensionId;
 
-		String text = dimension == 0 ? "Lore for the Righteous" : dimension == -1 ? "Lore for the Corrupted" : "";
+		String text = LoreLoader.INSTANCE.getTag(dimension);
 
 		// TEXT RENDERING
 		drawCenteredString(text, left + (XSIZE / 4), top + TEXT_Y, 0x000000);

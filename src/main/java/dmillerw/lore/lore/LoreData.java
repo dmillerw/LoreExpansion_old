@@ -2,7 +2,6 @@ package dmillerw.lore.lore;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import net.minecraft.nbt.NBTTagCompound;
 
 import java.util.Map;
 import java.util.Set;
@@ -13,30 +12,9 @@ import java.util.Set;
  */
 public class LoreData {
 
-	public static class DimensionString {
-		public int dimension;
-		public String string;
-
-		public DimensionString() {
-
-		}
-
-		public DimensionString(int dimension, String string) {
-			this.dimension = dimension;
-			this.string = string;
-		}
-
-		public DimensionString readFromNBT(NBTTagCompound nbt) {
-			dimension = nbt.getInteger("dimension");
-			string = nbt.getString("string");
-			return this;
-		}
-
-		public DimensionString writeToNBT(NBTTagCompound nbt) {
-			nbt.setInteger("dimension", dimension);
-			nbt.setString("string", string);
-			return this;
-		}
+	public static class DeserializedLoreTag {
+		public String defaultTag = "Lore Pages:";
+		public Map<Integer, String> mapping = Maps.newHashMap();
 	}
 
 	public static class DeserializedLore {

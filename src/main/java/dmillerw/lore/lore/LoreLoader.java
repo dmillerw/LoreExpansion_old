@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * @author dmillerw
@@ -20,13 +22,21 @@ public class LoreLoader {
 	static {
 		GsonBuilder builder = new GsonBuilder();
 		builder.registerTypeAdapter(LoreData.class, new LoreDeserializer());
+		builder.registerTypeAdapter(LoreData.DeserializedLoreTag.class, new TagDeserializer());
+		builder.registerTypeAdapter(LoreData.DeserializedLoreTag.class, new TagSerializer());
 		gson = builder.create();
 	}
 
 	private LoreData[] lore = new LoreData[MAX];
 
+	private LoreData.DeserializedLoreTag loreTags = new LoreData.DeserializedLoreTag();
+
 	public LoreData[] getLore() {
 		return lore;
+	}
+
+	public String getTag(int dimension) {
+		return loreTags.mapping.containsKey(dimension) ? loreTags.mapping.get(dimension) : loreTags.defaultTag;
 	}
 
 	public LoreData getLore(int page) {
@@ -41,5 +51,21 @@ public class LoreLoader {
 		LoreData.DeserializedLore data = gson.fromJson(new FileReader(file), LoreData.DeserializedLore.class);
 		LoreData lore = getLore(data.page);
 		lore.addLore(data);
+	}
+
+	public void loadLoreTags(File file) {
+		try {
+			loreTags = gson.fromJson(new FileReader(file), LoreData.DeserializedLoreTag.class);
+		} catch (IOException ex) {
+			// LOG ERROR
+		}
+	}
+
+	public void saveDefaultLoreTags(File file) throws IOException {
+		LoreData.DeserializedLoreTag defaultTags = new LoreData.DeserializedLoreTag();
+		String json = gson.toJson(defaultTags, LoreData.DeserializedLoreTag.class);
+		FileWriter writer = new FileWriter(file);
+		writer.append(json);
+		writer.close();
 	}
 }

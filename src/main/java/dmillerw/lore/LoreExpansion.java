@@ -21,6 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * @author dmillerw
@@ -63,6 +64,18 @@ public class LoreExpansion {
 					logger.warn(String.format("Failed to parse %s", file.getName()));
 					ex.printStackTrace();
 				}
+			}
+		}
+
+		File tagFile = new File(event.getModConfigurationDirectory(), CONFIG_FOLDER + "/tags.json");
+		if (tagFile.exists()) {
+			LoreLoader.INSTANCE.loadLoreTags(tagFile);
+		} else {
+			// Generate new file
+			try {
+				LoreLoader.INSTANCE.saveDefaultLoreTags(tagFile);
+			} catch (IOException ex) {
+				LoreExpansion.logger.warn(String.format("Failed to save default tags.json. This isn't a huge issue."));
 			}
 		}
 
