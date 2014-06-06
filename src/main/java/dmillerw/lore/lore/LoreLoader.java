@@ -21,7 +21,7 @@ public class LoreLoader {
 
 	static {
 		GsonBuilder builder = new GsonBuilder();
-		builder.registerTypeAdapter(LoreData.class, new LoreDeserializer());
+		builder.registerTypeAdapter(LoreData.DeserializedLore.class, new LoreDeserializer());
 		builder.registerTypeAdapter(LoreData.DeserializedLoreTag.class, new TagDeserializer());
 		builder.registerTypeAdapter(LoreData.DeserializedLoreTag.class, new TagSerializer());
 		gson = builder.create();
@@ -51,6 +51,16 @@ public class LoreLoader {
 		LoreData.DeserializedLore data = gson.fromJson(new FileReader(file), LoreData.DeserializedLore.class);
 		LoreData lore = getLore(data.page);
 		lore.addLore(data);
+
+//		boolean result = lore.addLore(data);
+
+//		System.out.println(data);
+//
+//		if (result) {
+//			LoreExpansion.logger.info("Loaded " + file.getName() + " into page " + data.page + " as a " + (data.global ? "global" : "dimensional file (" + data.dimension + ")"));
+//		} else {
+//			LoreExpansion.logger.warn("Failed to load " + file.getName() + ". Global: " + data.global + " Page: " + data.page + " Dimension: " + data.dimension);
+//		}
 	}
 
 	public void loadLoreTags(File file) {

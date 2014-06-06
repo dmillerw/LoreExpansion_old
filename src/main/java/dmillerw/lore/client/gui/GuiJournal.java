@@ -73,14 +73,18 @@ public class GuiJournal extends GuiScreen {
 		// TEXT RENDERING
 		drawCenteredString(text, left + (XSIZE / 4), top + TEXT_Y, 0x000000);
 		if (selectedLore >= 0) {
-			drawCenteredString(LoreLoader.INSTANCE.getLore(selectedLore).getTitle(dimension), (int) (left + XSIZE * 0.75F), top + TEXT_Y, 0x000000);
-			boolean unicodeCache = mc.fontRenderer.getUnicodeFlag();
-			mc.fontRenderer.setUnicodeFlag(false);
-			for (int i=scrollIndex; i<Math.min(scrollIndex + LORE_ROW_COUNT, currentLore.size()); i++) {
-				String lore = currentLore.get(i);
-				drawString(lore, left + 190, (top + 40 + fontRendererObj.FONT_HEIGHT) + fontRendererObj.FONT_HEIGHT * (i - scrollIndex), SCALE, 0x000000);
+			LoreData loreData = LoreLoader.INSTANCE.getLore(selectedLore);
+
+			if (loreData != null && loreData.validForDimension(dimension)) {
+				drawCenteredString(loreData.getTitle(dimension), (int) (left + XSIZE * 0.75F), top + TEXT_Y, 0x000000);
+				boolean unicodeCache = mc.fontRenderer.getUnicodeFlag();
+				mc.fontRenderer.setUnicodeFlag(false);
+				for (int i=scrollIndex; i<Math.min(scrollIndex + LORE_ROW_COUNT, currentLore.size()); i++) {
+					String lore = currentLore.get(i);
+					drawString(lore, left + 190, (top + 40 + fontRendererObj.FONT_HEIGHT) + fontRendererObj.FONT_HEIGHT * (i - scrollIndex), SCALE, 0x000000);
+				}
+				mc.fontRenderer.setUnicodeFlag(unicodeCache);
 			}
-			mc.fontRenderer.setUnicodeFlag(unicodeCache);
 		}
 
 		// LORE ICON BACKGROUNDS

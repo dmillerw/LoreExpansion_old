@@ -24,53 +24,75 @@ public class LoreData {
 		public String title;
 		public String lore;
 		public String sound;
+
+		@Override
+		public String toString() {
+			return "page: " + page + " global: " + global + " dimension: " + dimension + " title: " + title + " lore: " + lore + " sound: " + sound;
+		}
 	}
 
 	public int page;
 
 	public boolean global = false;
+	public String globalTitle;
+	public String globalLore;
+	public String globalSound;
 
 	public Set<Integer> contents = Sets.newHashSet();
 	public Map<Integer, String> title = Maps.newHashMap();
 	public Map<Integer, String> lore = Maps.newHashMap();
 	public Map<Integer, String> sound = Maps.newHashMap();
 
-	public LoreData addLore(DeserializedLore data) {
+	public boolean addLore(DeserializedLore data) {
+		// Obviously different pages can't be merged
 		if (page != data.page) {
-			return this;
+			return false;
 		}
 
-		if (contents.contains(data.dimension) || global) {
+		// Don't allow a non-global page to become global
+		if (data.global && !contents.isEmpty()) {
+			return false;
+		}
+
+		// If it's already set to global, or the page already has data for this dimension, deny
+		if (global || contents.contains(data.dimension)) {
 			// ERROR
-			return this;
+			return false;
 		}
 
+		// If not already global, and should be, set
 		if (!global && data.global) {
 			global = true;
 		}
 
-		contents.add(data.global ? 0 : data.dimension);
-		title.put(data.global ? 0 : data.dimension, data.title);
-		lore.put(data.global ? 0 : data.dimension, data.lore);
-		sound.put(data.global ? 0 : data.dimension, data.sound);
+		if (!global) {
+			contents.add(data.dimension);
+			title.put(data.dimension, data.title);
+			lore.put(data.dimension, data.lore);
+			sound.put(data.dimension, data.sound);
+		} else {
+			globalTitle = data.title;
+			globalLore = data.lore;
+			globalSound = data.sound;
+		}
 
-		return this;
+		return true;
 	}
 
 	public boolean validForDimension(int dimension) {
-		return contents.contains(dimension) || global;
+		return global || contents.contains(dimension);
 	}
 
 	public String getTitle(int dimension) {
-		return global ? title.get(0) : title.get(dimension);
+		return global ? globalTitle : title.get(dimension);
 	}
 
 	public String getLore(int dimension) {
-		return global ? lore.get(0) : lore.get(dimension);
+		return global ? globalLore : lore.get(dimension);
 	}
 
 	public String getSound(int dimension) {
-		return global ? sound.get(0) : sound.get(dimension);
+		return global ? globalSound : sound.get(dimension);
 	}
 
 	public boolean hasTitle(int dimension) {
