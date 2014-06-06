@@ -47,6 +47,13 @@ public class GuiJournal extends GuiScreen {
 
 	public GuiJournal(EntityPlayer player) {
 		this.player = player;
+
+		// PRELOADING - JUST IN CASE
+		for (LoreData data : LoreLoader.INSTANCE.getLore()) {
+			if (data != null) {
+				data.preloadSounds();
+			}
+		}
 	}
 
 	@Override
@@ -70,13 +77,16 @@ public class GuiJournal extends GuiScreen {
 
 		String text = LoreLoader.INSTANCE.getTag(dimension);
 
+		LoreData data = null;
+		if (selectedLore >= 0) {
+			data = LoreLoader.INSTANCE.getLore(selectedLore);
+		}
+
 		// TEXT RENDERING
 		drawCenteredString(text, left + (XSIZE / 4), top + TEXT_Y, 0x000000);
-		if (selectedLore >= 0) {
-			LoreData loreData = LoreLoader.INSTANCE.getLore(selectedLore);
-
-			if (loreData != null && loreData.validForDimension(dimension)) {
-				drawCenteredString(loreData.getTitle(dimension), (int) (left + XSIZE * 0.75F), top + TEXT_Y, 0x000000);
+		if (data != null) {
+			if (data != null && data.validForDimension(dimension)) {
+				drawCenteredString(data.getTitle(dimension), (int) (left + XSIZE * 0.75F), top + TEXT_Y, 0x000000);
 				boolean unicodeCache = mc.fontRenderer.getUnicodeFlag();
 				mc.fontRenderer.setUnicodeFlag(false);
 				for (int i=scrollIndex; i<Math.min(scrollIndex + LORE_ROW_COUNT, currentLore.size()); i++) {
@@ -90,19 +100,31 @@ public class GuiJournal extends GuiScreen {
 		// ARROWS
 		GL11.glColor4f(1, 1, 1, 1);
 		mc.getTextureManager().bindTexture(JOURNAL_RIGHT);
-		if (selectedLore >= 0 && scrollIndex > 0) {
+		if (data != null && scrollIndex > 0) {
 			drawTexturedModalRect(left + XSIZE / 2 + 78, top + 37, 168, 37, 13, 6);
 		}
-		if (selectedLore >= 0 && currentLore.size() - LORE_ROW_COUNT > scrollIndex) {
+		if (data != null && currentLore.size() - LORE_ROW_COUNT > scrollIndex) {
 			drawTexturedModalRect(left + XSIZE / 2 + 78, top + 203, 168, 203, 13, 6);
+		}
+
+		// AUDIO CONTROL
+		GL11.glColor4f(1, 1, 1, 1);
+		if (data != null) {
+			if (data.getSound(dimension).isPlaying()) {
+				drawTexturedModalRect(left + XSIZE / 2 + 41, top + 204, 170, 192, 5, 5); // STOP
+				drawTexturedModalRect(left + XSIZE / 2 + 122, top + 203, 177, 184, 4, 7); // START
+			} else {
+				drawTexturedModalRect(left + XSIZE / 2 + 41, top + 204, 170, 185, 5, 5); // STOP
+				drawTexturedModalRect(left + XSIZE / 2 + 122, top + 203, 177, 191, 4, 7); // START
+			}
 		}
 
 		// LORE ICON BACKGROUNDS
 		GL11.glColor4f(1, 1, 1, 1);
 		mc.getTextureManager().bindTexture(JOURNAL_LEFT);
-		for (LoreData data : LoreLoader.INSTANCE.getLore()) {
-			if (data != null && data.validForDimension(dimension)) {
-				int page = data.page;
+		for (LoreData lore : LoreLoader.INSTANCE.getLore()) {
+			if (lore != null && lore.validForDimension(dimension)) {
+				int page = lore.page;
 
 				int drawX = (((page - 1) % 4) * SLOT_GAP);
 				int drawY = 0;
@@ -120,9 +142,9 @@ public class GuiJournal extends GuiScreen {
 		IIcon icon = LoreExpansion.loreScrap.getIconFromDamage(0);
 		mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
 		for (int page : loreCache) {
-			LoreData data = LoreLoader.INSTANCE.getLore(page);
+			LoreData lore = LoreLoader.INSTANCE.getLore(page);
 
-			if (data.validForDimension(dimension)) {
+			if (lore.validForDimension(dimension)) {
 				int drawX = (((page - 1) % 4) * SLOT_GAP);
 				int drawY = 0;
 
@@ -137,9 +159,9 @@ public class GuiJournal extends GuiScreen {
 		// LORE TOOLTIPS
 		GL11.glColor4f(1, 1, 1, 1);
 		for (int page : loreCache) {
-			LoreData data = LoreLoader.INSTANCE.getLore(page);
+			LoreData lore = LoreLoader.INSTANCE.getLore(page);
 
-			if (data.validForDimension(dimension)) {
+			if (lore.validForDimension(dimension)) {
 				int drawX = (((page - 1) % 4) * SLOT_GAP);
 				int drawY = 0;
 
@@ -180,8 +202,6 @@ public class GuiJournal extends GuiScreen {
 					drawY = (((page - 1) / 4) * SLOT_GAP);
 				}
 
-				data.getSound(dimension).play();
-
 				if (inBounds(drawX, drawY, 16, 16, mouseX, mouseY)) {
 					currentLore.clear();
 					selectedLore = page;
@@ -219,6 +239,24 @@ public class GuiJournal extends GuiScreen {
 		}
 		if (inBounds(left + XSIZE / 2 + 78, top + 203, 13, 16, x, y)) {
 			scroll(1);
+		}
+
+		// AUDIO CONTROL
+		LoreData data = null;
+		if (selectedLore >= 0) {
+			data = LoreLoader.INSTANCE.getLore(selectedLore);
+		}
+
+		if (data != null) {
+			if (data.getSound(dimension).isPlaying()) {
+				if (inBounds(left + XSIZE / 2 + 41, top + 204, 5, 5, x, y)) {
+					data.getSound(dimension).stop();
+				}
+			} else {
+				if (inBounds(left + XSIZE / 2 + 122, top + 203, 4, 7, x, y)) {
+					data.getSound(dimension).start();
+				}
+			}
 		}
 	}
 

@@ -17,6 +17,7 @@ import net.minecraftforge.common.MinecraftForge;
 
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author dmillerw
@@ -25,8 +26,12 @@ public class SoundLoader {
 
 	public static final String PREFIX = "loreexp";
 
+	public static ISound lastSound;
+
 	/** File-name to be read */
 	private final String file;
+
+	private boolean loaded = false;
 
 	public SoundLoader(String file) {
 		this.file = file;
@@ -38,7 +43,10 @@ public class SoundLoader {
 		Map resourceManagers = ReflectionHelper.getPrivateValue(SimpleReloadableResourceManager.class, (SimpleReloadableResourceManager) Minecraft.getMinecraft().getResourceManager(), 2);
 		FallbackResourceManager resourceManager = (FallbackResourceManager) resourceManagers.get(PREFIX);
 		resourceManager.addResourcePack(new LoreResourcePack(file));
+	}
 
+	@SideOnly(Side.CLIENT)
+	public void registerSound() {
 		SoundHandler soundHandler = Minecraft.getMinecraft().getSoundHandler();
 
 		SoundList list = new SoundList();
@@ -58,10 +66,49 @@ public class SoundLoader {
 	}
 
 	@SideOnly(Side.CLIENT)
-	public ISound play() {
-		ResourceLocation location = new ResourceLocation(PREFIX, file);
-		ISound sound = new GlobalSound(location, 4F, 1F);
-		Minecraft.getMinecraft().getSoundHandler().playSound(sound);
-		return sound;
+	public void registerSoundThreaded() {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				registerSound();
+			}
+		}).start();
+	}
+
+	@SideOnly(Side.CLIENT)
+	public ISound getSound() {
+		if (!loaded) {
+			registerSoundThreaded();
+			loaded = true;
+		}
+
+		if (lastSound == null) {
+			ResourceLocation location = new ResourceLocation(PREFIX, file);
+			lastSound = new GlobalSound(location, 4F, 1F);
+		}
+
+		return lastSound;
+	}
+
+	@SideOnly(Side.CLIENT)
+	public void start() {
+		Minecraft.getMinecraft().getSoundHandler().playSound(getSound());
+	}
+
+	@SideOnly(Side.CLIENT)
+	public boolean isPlaying() {
+		boolean playing = lastSound != null && lastSound.getPositionedSoundLocation() == getSound().getPositionedSoundLocation() && Minecraft.getMinecraft().getSoundHandler().isSoundPlaying(getSound());
+		if (!playing) {
+			lastSound = null;
+		}
+		return playing;
+	}
+
+	@SideOnly(Side.CLIENT)
+	public void stop() {
+		if (isPlaying()) {
+			Minecraft.getMinecraft().getSoundHandler().stopSound(getSound());
+			lastSound = null;
+		}
 	}
 }
