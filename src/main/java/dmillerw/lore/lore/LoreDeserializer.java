@@ -24,6 +24,7 @@ public class LoreDeserializer implements JsonDeserializer<LoreData.DeserializedL
 			if (key.equalsIgnoreCase("page")) {
 				data.page = element.getAsInt();
 			} else if (key.equalsIgnoreCase("dimension")) {
+				data.global = false;
 				data.dimension = element.getAsInt();
 			} else if (key.equalsIgnoreCase("title")) {
 				data.title = element.getAsString();

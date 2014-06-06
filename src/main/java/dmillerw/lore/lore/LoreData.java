@@ -19,6 +19,7 @@ public class LoreData {
 
 	public static class DeserializedLore {
 		public int page;
+		public boolean global = true; // Default
 		public int dimension = 0; // Default
 		public String title;
 		public String lore;
@@ -26,6 +27,9 @@ public class LoreData {
 	}
 
 	public int page;
+
+	public boolean global = false;
+
 	public Set<Integer> contents = Sets.newHashSet();
 	public Map<Integer, String> title = Maps.newHashMap();
 	public Map<Integer, String> lore = Maps.newHashMap();
@@ -36,45 +40,49 @@ public class LoreData {
 			return this;
 		}
 
-		if (contents.contains(data.dimension)) {
+		if (contents.contains(data.dimension) || global) {
 			// ERROR
 			return this;
 		}
 
-		contents.add(data.dimension);
-		title.put(data.dimension, data.title);
-		lore.put(data.dimension, data.lore);
-		sound.put(data.dimension, data.sound);
+		if (!global && data.global) {
+			global = true;
+		}
+
+		contents.add(data.global ? 0 : data.dimension);
+		title.put(data.global ? 0 : data.dimension, data.title);
+		lore.put(data.global ? 0 : data.dimension, data.lore);
+		sound.put(data.global ? 0 : data.dimension, data.sound);
 
 		return this;
 	}
 
 	public boolean validForDimension(int dimension) {
-		return contents.contains(dimension);
+		return contents.contains(dimension) || global;
 	}
 
 	public String getTitle(int dimension) {
-		return title.get(dimension);
+		return global ? title.get(0) : title.get(dimension);
 	}
 
 	public String getLore(int dimension) {
-		return lore.get(dimension);
+		return global ? lore.get(0) : lore.get(dimension);
 	}
 
 	public String getSound(int dimension) {
-		return sound.get(dimension);
+		return global ? sound.get(0) : sound.get(dimension);
 	}
 
 	public boolean hasTitle(int dimension) {
-		return title.containsKey(dimension);
+		return global || title.containsKey(dimension);
 	}
 
 	public boolean hasLore(int dimension) {
-		return lore.containsKey(dimension);
+		return global || lore.containsKey(dimension);
 	}
 
 	public boolean hasSound(int dimension) {
-		return sound.containsKey(dimension);
+		return global || sound.containsKey(dimension);
 	}
 
 	@Override
