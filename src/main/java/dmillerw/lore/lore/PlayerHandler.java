@@ -2,17 +2,12 @@ package dmillerw.lore.lore;
 
 import dmillerw.lore.LoreExpansion;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagIntArray;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraftforge.common.util.Constants;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author dmillerw
@@ -59,45 +54,19 @@ public class PlayerHandler {
 	public static void loadPlayerLore(EntityPlayer player) {
 		if (player != null && !player.worldObj.isRemote) {
 			try {
-				NBTTagCompound data = null;
-				boolean save = false;
 				File file = getFileForPlayer(player);
 
 				if (file != null && file.exists()) {
-					try {
-						FileInputStream fileInputStream = new FileInputStream(file);
-						data = CompressedStreamTools.readCompressed(fileInputStream);
-						fileInputStream.close();
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
-				}
 
-				if (file == null || !file.exists() || data == null || data.hasNoTags()) {
-					LoreExpansion.logger.warn("Lore data not found for %s. Attempting to load backup file", player.getCommandSenderName());
-					file = getBackupFileForPlayer(player);
+				} else {
+					File backup = getBackupFileForPlayer(player);
+
 					if (file != null && file.exists()) {
-						try {
-							FileInputStream fileinputstream = new FileInputStream(file);
-							data = CompressedStreamTools.readCompressed(fileinputstream);
-							fileinputstream.close();
-							save = true;
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				}
 
-				if (data != null) {
-					int[] array = data.getIntArray("lore");
-					List<Integer> list = new ArrayList<Integer>();
-					for (int i=0; i<array.length; i++) {
-						list.add(array[i]);
 					}
-					setLore(player, list);
 				}
 			} catch (Exception ex) {
-				LoreExpansion.logger.fatal("Failed to load lore data for %s", player.getCommandSenderName());
+				LoreExpansion.logger.fatal(String.format("Failed to load lore data for %s", player.getCommandSenderName()));
 				ex.printStackTrace();
 			}
 		}
@@ -106,50 +75,9 @@ public class PlayerHandler {
 	public static void savePlayerBaubles(EntityPlayer player) {
 		if (player != null && !player.worldObj.isRemote) {
 			try {
-				File file2 = getBackupFileForPlayer(player);
-				if (file2 != null && file2.exists()) {
-					try {
-						file2.delete();
-					} catch (Exception e) {
-						LoreExpansion.logger.error("Could not delete backup file for player " + player.getCommandSenderName());
-					}
-				}
 
-				File file1 = getFileForPlayer(player);
-				file2 = getBackupFileForPlayer(player);
-				if (file1 != null && file1.exists()) {
-					try {
-						file1.renameTo(file2);
-					} catch (Exception e) {
-						LoreExpansion.logger.error("Could not backup old baubles file for player " + player.getCommandSenderName());
-					}
-				}
-
-				file1 = getFileForPlayer(player);
-				try {
-					if (file1 != null) {
-						List<Integer> list = getLore(player);
-						NBTTagCompound data = new NBTTagCompound();
-						NBTTagIntArray array = new NBTTagIntArray(ArrayUtils.toPrimitive(list.toArray(new Integer[list.size()])));
-						data.setTag("lore", array);
-
-						FileOutputStream fileoutputstream = new FileOutputStream(file1);
-						CompressedStreamTools.writeCompressed(data, fileoutputstream);
-						fileoutputstream.close();
-
-					}
-				} catch (Exception e) {
-					LoreExpansion.logger.error("Could not save baubles file for player " + player.getCommandSenderName());
-					e.printStackTrace();
-					if (file1.exists()) {
-						try {
-							file1.delete();
-						} catch (Exception e2) {
-						}
-					}
-				}
 			} catch (Exception exception1) {
-				LoreExpansion.logger.fatal("Error saving baubles inventory");
+				LoreExpansion.logger.fatal(String.format("Failed to save lore data for %s", player.getCommandSenderName()));
 				exception1.printStackTrace();
 			}
 		}

@@ -38,7 +38,7 @@ public class LoreLoader {
 	}
 
 	public void loadLore(File file) throws Exception {
-		DeserializedLore data = gson.fromJson(new FileReader(file), DeserializedLore.class);
+		LoreData.DeserializedLore data = gson.fromJson(new FileReader(file), LoreData.DeserializedLore.class);
 		LoreData lore = getLore(data.page);
 		lore.addLore(data);
 	}

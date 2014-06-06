@@ -4,7 +4,7 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import dmillerw.lore.LoreExpansion;
-import dmillerw.lore.lore.PlayerHandler;
+import dmillerw.lore.client.gui.GuiJournal;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -44,11 +44,12 @@ public class PacketSyncLore implements IMessage, IMessageHandler<PacketSyncLore,
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		player = buf.readInt();
 		lore = new ArrayList<Integer>();
+		player = buf.readInt();
 		int size = buf.readInt();
 		for (int i=0; i<size; i++) {
-			lore.add(buf.readInt());
+			int data = buf.readInt();
+			this.lore.add(data);
 		}
 	}
 
@@ -57,11 +58,10 @@ public class PacketSyncLore implements IMessage, IMessageHandler<PacketSyncLore,
 		World world = LoreExpansion.proxy.getClientWorld();
 		if (world == null) {
 			return null;
-
 		}
 		Entity entity = world.getEntityByID(message.player);
 		if (entity != null && entity instanceof EntityPlayer) {
-			PlayerHandler.setLore((EntityPlayer) entity, lore);
+			GuiJournal.loreCache = message.lore;
 		}
 		return null;
 	}

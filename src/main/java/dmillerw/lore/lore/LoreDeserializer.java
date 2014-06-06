@@ -11,11 +11,11 @@ import java.util.Map;
 /**
  * @author dmillerw
  */
-public class LoreDeserializer implements JsonDeserializer<DeserializedLore> {
+public class LoreDeserializer implements JsonDeserializer<LoreData.DeserializedLore> {
 
 	@Override
-	public DeserializedLore deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-		DeserializedLore data = new DeserializedLore();
+	public LoreData.DeserializedLore deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+		LoreData.DeserializedLore data = new LoreData.DeserializedLore();
 
 		for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject().entrySet()) {
 			String key = entry.getKey();

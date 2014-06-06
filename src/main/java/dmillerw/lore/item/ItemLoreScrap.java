@@ -10,8 +10,10 @@ import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.S2FPacketSetSlot;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
@@ -35,7 +37,7 @@ public class ItemLoreScrap extends Item {
 	}
 
 	@Override
-	public void onUpdate(ItemStack stack, World world, Entity entity, int i, boolean b) {
+	public void onUpdate(ItemStack stack, World world, Entity entity, int slot, boolean held) {
 		if (!world.isRemote && entity instanceof EntityPlayer) {
 			if (stack.getItemDamage() > 0) {
 				int dimension = entity.worldObj.provider.dimensionId;
@@ -58,7 +60,8 @@ public class ItemLoreScrap extends Item {
 				PlayerHandler.setLore((EntityPlayer) entity, list);
 				PacketHandler.INSTANCE.sendToAll(new PacketSyncLore((EntityPlayer) entity, list));
 
-				stack.stackSize = 0;
+				((EntityPlayer)entity).inventory.setInventorySlotContents(slot, null);
+				((EntityPlayerMP)entity).playerNetServerHandler.sendPacket(new S2FPacketSetSlot(-1, slot, null));
 			}
 		}
 	}

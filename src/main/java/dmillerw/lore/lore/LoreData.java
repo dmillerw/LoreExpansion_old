@@ -2,7 +2,6 @@ package dmillerw.lore.lore;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import dmillerw.lore.LoreExpansion;
 import net.minecraft.nbt.NBTTagCompound;
 
 import java.util.Map;
@@ -38,6 +37,14 @@ public class LoreData {
 			nbt.setString("string", string);
 			return this;
 		}
+	}
+
+	public static class DeserializedLore {
+		public int page;
+		public int dimension = 0; // Default
+		public String title;
+		public String lore;
+		public String sound;
 	}
 
 	public int page;
