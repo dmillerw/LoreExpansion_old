@@ -29,7 +29,6 @@ public class CommandLore extends CommandBase {
 		}
 
 		if (args[0].equalsIgnoreCase("reload")) {
-			sender.addChatMessage(new ChatComponentText("WARNING: Due to various oddities within Minecraft, this will NOT reload sound! That requires a restart of the client."));
 			LoreLoader.INSTANCE.clear();
 			LoreLoader.initialize();
 			sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Reloaded Lore"));
