@@ -1,6 +1,6 @@
 package dmillerw.lore.client.sound;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
@@ -11,7 +11,7 @@ import paulscode.sound.SoundSystem;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * @author dmillerw
@@ -23,9 +23,9 @@ public class SoundHandler {
 	private static final String[] SOUND_MANAGER_MAPPING = new String[] {"sndManager", "field_147694_f"};
 	private static final String[] SOUND_SYSTEM_MAPPING = new String[] {"sndSystem", "field_148620_e"};
 
-	private static boolean paused = false;
+	private static boolean gamePause = false;
 
-	private Map<String, String> nameToTempMap = Maps.newHashMap();
+	private Set<String> isLoaded = Sets.newHashSet();
 
 	private SoundManager soundManager;
 
@@ -33,6 +33,7 @@ public class SoundHandler {
 
 	private String nowPlaying = "";
 
+	private boolean paused = false;
 	private boolean loaded = false;
 
 	private void initialize() {
@@ -65,8 +66,13 @@ public class SoundHandler {
 			File file = getFile(name);
 			URL url = file.toURI().toURL();
 
-			nowPlaying = getSoundSystem().quickStream(true, url, file.getName(), false, 0F, 0F, 0F, 1, 0F);
-			nameToTempMap.put(name, nowPlaying);
+			if (!isLoaded.contains(name)) {
+				getSoundSystem().newStreamingSource(true, name, url, file.getName(), false, 0F, 0F, 0F, 1, 0F);
+				getSoundSystem().activate(name);
+			}
+
+			soundSystem.play(name);
+			nowPlaying = name;
 		} catch (Exception ex) {
 			nowPlaying = "";
 			ex.printStackTrace();
@@ -79,26 +85,58 @@ public class SoundHandler {
 		}
 
 		getSoundSystem().stop(nowPlaying);
+		getSoundSystem().removeSource(nowPlaying);
 		nowPlaying = "";
+		gamePause = false;
+		paused = false;
+	}
+
+	public void pause() {
+		if (nowPlaying.isEmpty()) {
+			return;
+		}
+
+		getSoundSystem().pause(nowPlaying);
+		paused = true;
+	}
+
+	public void resume() {
+		if (nowPlaying.isEmpty()) {
+			return;
+		}
+
+		if (paused) {
+			getSoundSystem().play(nowPlaying);
+			paused = false;
+		}
+	}
+
+	public boolean isPaused() {
+		return paused;
 	}
 
 	public boolean isPlaying(String name) {
-		return nameToTempMap.containsKey(name) && nameToTempMap.get(name).equals(nowPlaying);
+		return nowPlaying.equals(name);
 	}
 
 	@SubscribeEvent
 	public void onClientTick(TickEvent.ClientTickEvent event) {
+		if (Minecraft.getMinecraft().theWorld == null && !nowPlaying.isEmpty()) {
+			stop();
+			return;
+		}
+
 		boolean currentState = false;
 		if (Minecraft.getMinecraft().isGamePaused()) {
 			currentState = true;
 		}
 
-		if (currentState && !paused) {
-			getSoundSystem().pause(nowPlaying);
-			paused = true;
-		} else if (!currentState && paused) {
-			getSoundSystem().play(nowPlaying);
-			paused = false;
+		if (currentState && !gamePause) {
+			pause();
+			gamePause = true;
+		} else if (!currentState && gamePause) {
+			resume();
+			gamePause = false;
 		}
 	}
 }

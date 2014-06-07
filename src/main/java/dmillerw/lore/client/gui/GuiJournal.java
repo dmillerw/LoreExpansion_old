@@ -114,7 +114,11 @@ public class GuiJournal extends GuiScreen {
 			String sound = data.getSound(dimension);
 			if (SoundHandler.INSTANCE.isPlaying(sound)) {
 				drawTexturedModalRect(left + XSIZE / 2 + 41, top + 204, 170, 192, 5, 5); // STOP
-				drawTexturedModalRect(left + XSIZE / 2 + 122, top + 203, 177, 184, 4, 7); // START
+				if (SoundHandler.INSTANCE.isPaused()) {
+					drawTexturedModalRect(left + XSIZE / 2 + 122, top + 204, 183, 185, 5, 5); // PAUSE
+				} else {
+					drawTexturedModalRect(left + XSIZE / 2 + 122, top + 204, 183, 192, 5, 5); // PAUSE
+				}
 			} else {
 				drawTexturedModalRect(left + XSIZE / 2 + 41, top + 204, 170, 185, 5, 5); // STOP
 				drawTexturedModalRect(left + XSIZE / 2 + 122, top + 203, 177, 191, 4, 7); // START
@@ -231,6 +235,12 @@ public class GuiJournal extends GuiScreen {
 			if (SoundHandler.INSTANCE.isPlaying(sound)) {
 				if (inBounds(left + XSIZE / 2 + 41, top + 204, 5, 5, x, y)) {
 					SoundHandler.INSTANCE.stop();
+				} else if (inBounds(left + XSIZE / 2 + 122, top + 203, 4, 7, x, y)) {
+					if (!SoundHandler.INSTANCE.isPaused()) {
+						SoundHandler.INSTANCE.pause();
+					} else {
+						SoundHandler.INSTANCE.resume();
+					}
 				}
 			} else {
 				if (inBounds(left + XSIZE / 2 + 122, top + 203, 4, 7, x, y)) {
