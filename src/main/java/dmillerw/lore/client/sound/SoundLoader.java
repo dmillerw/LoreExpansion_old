@@ -25,12 +25,17 @@ public class SoundLoader {
 
 	public static final String PREFIX = "loreexp";
 
+	public static void preload(SoundLoader loader) {
+		loader.start();
+		loader.stop();
+	}
+
 	public static ISound lastSound;
 
 	/** File-name to be read */
 	private final String file;
 
-	private boolean loaded = false;
+	public boolean loaded = false;
 
 	public SoundLoader(String file) {
 		this.file = file;
@@ -39,6 +44,8 @@ public class SoundLoader {
 
 	@SubscribeEvent
 	public void onSoundLoad(SoundLoadEvent event) {
+		loaded = false;
+
 		Map resourceManagers = ReflectionHelper.getPrivateValue(SimpleReloadableResourceManager.class, (SimpleReloadableResourceManager) Minecraft.getMinecraft().getResourceManager(), 2);
 		FallbackResourceManager resourceManager = (FallbackResourceManager) resourceManagers.get(PREFIX);
 		resourceManager.addResourcePack(new LoreResourcePack(file));

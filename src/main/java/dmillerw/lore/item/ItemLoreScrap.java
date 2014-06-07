@@ -75,7 +75,7 @@ public class ItemLoreScrap extends Item {
 			int dimension = player.worldObj.provider.dimensionId;
 			LoreData data = LoreLoader.INSTANCE.getLore(stack.getItemDamage());
 
-			if (data == null || (data.contents.isEmpty() || !data.global)) {
+			if (data == null || (data.contents.isEmpty() && !data.global)) {
 				LoreExpansion.logger.warn("Found item with invalid lore ID. Resetting");
 				stack.setItemDamage(0);
 			}

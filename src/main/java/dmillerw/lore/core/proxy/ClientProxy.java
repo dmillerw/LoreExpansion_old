@@ -2,12 +2,14 @@ package dmillerw.lore.core.proxy;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import dmillerw.lore.LoreExpansion;
+import dmillerw.lore.client.handler.ClientTickHandler;
 import dmillerw.lore.core.handler.KeyHandler;
-import dmillerw.lore.lore.LoreData;
-import dmillerw.lore.lore.LoreLoader;
 import net.minecraft.world.World;
+import net.minecraftforge.common.config.Configuration;
+
+import java.io.File;
 
 /**
  * @author dmillerw
@@ -16,15 +18,14 @@ public class ClientProxy extends CommonProxy {
 
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
-		FMLCommonHandler.instance().bus().register(KeyHandler.INSTANCE);
-	}
+		Configuration config = new Configuration(new File(LoreExpansion.configFolder, "config.cfg"));
+		config.load();
+		boolean preload = config.get(Configuration.CATEGORY_GENERAL, "preload", true, "Preload all lore sounds when the game starts. Will induce additional startup lag, but prevents lag during game.").getBoolean(true);
+		config.save();
 
-	@Override
-	public void postInit(FMLPostInitializationEvent event) {
-		for (LoreData data : LoreLoader.INSTANCE.getLore()) {
-			if (data != null) {
-				data.preloadSounds();
-			}
+		FMLCommonHandler.instance().bus().register(KeyHandler.INSTANCE);
+		if (preload) {
+			FMLCommonHandler.instance().bus().register(new ClientTickHandler());
 		}
 	}
 

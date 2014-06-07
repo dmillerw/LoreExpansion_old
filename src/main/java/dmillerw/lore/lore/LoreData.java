@@ -108,12 +108,27 @@ public class LoreData {
 		return global || sound.containsKey(dimension);
 	}
 
-	public void preloadSounds() {
+	public boolean shouldPreload() {
 		if (globalSound != null) {
-			globalSound.registerSoundThreaded();
+			if (!globalSound.loaded) return true;
 		}
 		for (Map.Entry<Integer, SoundLoader> entry : sound.entrySet()) {
-			entry.getValue().registerSoundThreaded();
+			if (!entry.getValue().loaded) return true;
+		}
+		return false;
+	}
+
+	public void preloadSounds() {
+		if (globalSound != null) {
+			globalSound.registerSound();
+			globalSound.start();
+			globalSound.stop();
+		} else {
+			for (Map.Entry<Integer, SoundLoader> entry : sound.entrySet()) {
+				entry.getValue().registerSound();
+				entry.getValue().start();
+				entry.getValue().stop();
+			}
 		}
 	}
 
