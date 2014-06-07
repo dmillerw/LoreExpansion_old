@@ -87,8 +87,9 @@ public class ItemLoreScrap extends Item {
 
 	@Override
 	public void getSubItems(Item item, CreativeTabs tab, List list) {
+		int dimension = FMLClientHandler.instance().getClient().theWorld.provider.dimensionId;
 		for (LoreData data : LoreLoader.INSTANCE.getLore()) {
-			if (data != null && data.validForDimension(FMLClientHandler.instance().getClient().theWorld.provider.dimensionId)) {
+			if (data != null && data.validForDimension(dimension) && data.hasLore(dimension)) {
 				list.add(new ItemStack(this, 1, data.page));
 			}
 		}
