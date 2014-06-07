@@ -3,9 +3,11 @@ package dmillerw.lore.client.gui;
 import cpw.mods.fml.client.FMLClientHandler;
 import dmillerw.lore.LoreExpansion;
 import dmillerw.lore.client.sound.SoundHandler;
+import dmillerw.lore.core.proxy.ClientProxy;
 import dmillerw.lore.lore.LoreData;
 import dmillerw.lore.lore.LoreLoader;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.IIcon;
@@ -38,7 +40,7 @@ public class GuiJournal extends GuiScreen {
 	
 	public static List<Integer> loreCache = new ArrayList<Integer>();
 
-	private static int selectedLore = -1;
+	public static int selectedLore = -1;
 
 	private static int scrollIndex = 0;
 
@@ -54,6 +56,7 @@ public class GuiJournal extends GuiScreen {
 	public void initGui() {
 		if (selectedLore >= 0) {
 			loadLore(selectedLore);
+			ClientProxy.pickedUpPage = -1;
 		}
 	}
 
@@ -127,6 +130,8 @@ public class GuiJournal extends GuiScreen {
 
 		// LORE ICON BACKGROUNDS
 		GL11.glColor4f(1, 1, 1, 1);
+		OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+		GL11.glEnable(GL11.GL_BLEND);
 		mc.getTextureManager().bindTexture(JOURNAL_LEFT);
 		for (LoreData lore : LoreLoader.INSTANCE.getLore()) {
 			if (lore != null && lore.validForDimension(dimension)) {
@@ -139,9 +144,14 @@ public class GuiJournal extends GuiScreen {
 					drawY = (((page - 1) / 4) * SLOT_GAP);
 				}
 
-				drawTexturedModalRect(startX + drawX - 1, startY + drawY - 1, 178, 45, 18, 18);
+				if (page == selectedLore) {
+					drawTexturedModalRect(startX + drawX - 1, startY + drawY - 1, 178, 68, 18, 18);
+				} else {
+					drawTexturedModalRect(startX + drawX - 1, startY + drawY - 1, 178, 45, 18, 18);
+				}
 			}
 		}
+		GL11.glDisable(GL11.GL_BLEND);
 
 		// LORE ICONS
 		GL11.glColor4f(1, 1, 1, 1);

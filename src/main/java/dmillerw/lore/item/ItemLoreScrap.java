@@ -6,7 +6,6 @@ import dmillerw.lore.core.TabLore;
 import dmillerw.lore.lore.LoreData;
 import dmillerw.lore.lore.LoreLoader;
 import dmillerw.lore.lore.PlayerHandler;
-import dmillerw.lore.network.PacketHandler;
 import dmillerw.lore.network.PacketSyncLore;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -44,7 +43,7 @@ public class ItemLoreScrap extends Item {
 				if (stack.getItemDamage() > 0) {
 					LoreData data = LoreLoader.INSTANCE.getLore(stack.getItemDamage());
 
-					if (data == null || data.contents.isEmpty()) {
+					if (data == null || (data.contents.isEmpty() && !data.global)) {
 						LoreExpansion.logger.warn("Found item with invalid lore ID. Resetting");
 						stack.setItemDamage(0);
 					}
@@ -59,7 +58,7 @@ public class ItemLoreScrap extends Item {
 						list.add(stack.getItemDamage());
 					}
 					PlayerHandler.setLore(player, list);
-					PacketHandler.INSTANCE.sendTo(new PacketSyncLore(player, list), (EntityPlayerMP) player);
+					PacketSyncLore.updateLore((EntityPlayerMP) player);
 
 					player.addChatComponentMessage(new ChatComponentText("Added lore page #" + data.page));
 				}

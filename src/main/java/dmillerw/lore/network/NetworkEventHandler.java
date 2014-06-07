@@ -18,7 +18,7 @@ public class NetworkEventHandler {
 		if (side == Side.SERVER) {
 			PlayerHandler.clearLore(event.player);
 			PlayerHandler.loadPlayerLore(event.player);
-			PacketHandler.INSTANCE.sendTo(new PacketSyncLore(event.player, PlayerHandler.getLore(event.player)), (EntityPlayerMP) event.player);
+			PacketSyncLore.updateLore((EntityPlayerMP) event.player);
 		}
 	}
 

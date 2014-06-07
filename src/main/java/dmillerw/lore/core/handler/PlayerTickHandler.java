@@ -7,8 +7,9 @@ import dmillerw.lore.LoreExpansion;
 import dmillerw.lore.lore.LoreData;
 import dmillerw.lore.lore.LoreLoader;
 import dmillerw.lore.lore.PlayerHandler;
-import dmillerw.lore.network.PacketHandler;
+import dmillerw.lore.network.PacketNotifyOfPickup;
 import dmillerw.lore.network.PacketSyncLore;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
 import org.lwjgl.input.Keyboard;
@@ -33,7 +34,7 @@ public class PlayerTickHandler {
 						if (stack.getItemDamage() > 0) {
 							LoreData data = LoreLoader.INSTANCE.getLore(stack.getItemDamage());
 
-							if (data == null || data.contents.isEmpty()) {
+							if (data == null || (data.contents.isEmpty() && !data.global)) {
 								LoreExpansion.logger.warn("Found item with invalid lore ID. Resetting");
 								stack.setItemDamage(0);
 								return;
@@ -49,10 +50,11 @@ public class PlayerTickHandler {
 								list.add(stack.getItemDamage());
 							}
 							PlayerHandler.setLore(event.player, list);
-							PacketHandler.INSTANCE.sendToAll(new PacketSyncLore(event.player, list));
+							PacketSyncLore.updateLore((EntityPlayerMP) event.player);
+							PacketNotifyOfPickup.notify((EntityPlayerMP) event.player, data.page);
 
 							if (!notifiedThisTick) {
-								event.player.addChatComponentMessage(new ChatComponentText("You've discovered a new lore page. Press " + Keyboard.getKeyName(KeyHandler.INSTANCE.key.getKeyCode()) + " to open your journal"));
+								event.player.addChatComponentMessage(new ChatComponentText("You've discovered a new lore page. Press " + Keyboard.getKeyName(KeyHandler.INSTANCE.key.getKeyCode()) + " to view"));
 								notifiedThisTick = true;
 							}
 

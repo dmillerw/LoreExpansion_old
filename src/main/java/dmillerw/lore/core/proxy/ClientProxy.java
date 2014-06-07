@@ -6,12 +6,15 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import dmillerw.lore.client.sound.SoundHandler;
 import dmillerw.lore.core.handler.KeyHandler;
+import dmillerw.lore.network.PacketNotifyOfPickup;
 import net.minecraft.world.World;
 
 /**
  * @author dmillerw
  */
 public class ClientProxy extends CommonProxy {
+
+	public static int pickedUpPage = -1;
 
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
@@ -22,6 +25,11 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void postInit(FMLPostInitializationEvent event) {
 
+	}
+
+	@Override
+	public void handlePickupPacket(PacketNotifyOfPickup packet) {
+		pickedUpPage = packet.page;
 	}
 
 	@Override

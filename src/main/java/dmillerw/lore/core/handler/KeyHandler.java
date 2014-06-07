@@ -7,7 +7,9 @@ import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import dmillerw.lore.LoreExpansion;
+import dmillerw.lore.client.gui.GuiJournal;
 import dmillerw.lore.core.GuiHandler;
+import dmillerw.lore.core.proxy.ClientProxy;
 import net.minecraft.client.settings.KeyBinding;
 import org.lwjgl.input.Keyboard;
 
@@ -32,6 +34,9 @@ public class KeyHandler {
 		}
 		if (event.phase == TickEvent.Phase.START) {
 			if (key.getIsKeyPressed() && FMLClientHandler.instance().getClient().inGameHasFocus) {
+				if (ClientProxy.pickedUpPage != -1) {
+					GuiJournal.selectedLore = ClientProxy.pickedUpPage;
+				}
 				event.player.openGui(LoreExpansion.instance, GuiHandler.GUI_JOURNAL, event.player.worldObj, 0, 0, 0);
 			}
 		}
