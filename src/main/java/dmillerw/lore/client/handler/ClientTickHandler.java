@@ -13,16 +13,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class ClientTickHandler {
 
+	private boolean preload = true;
+
 	@SubscribeEvent
 	public void onClientTick(TickEvent.ClientTickEvent event) {
-		boolean shouldPreload = false;
-		for (LoreData data : LoreLoader.INSTANCE.getLore()) {
-			if (data != null && data.shouldPreload()) {
-				shouldPreload = true;
-			}
-		}
-
-		if (shouldPreload) {
+		if (preload) {
 			LoreExpansion.logger.info("Preloading sounds. This may take a while");
 			long startTime = System.nanoTime();
 			for (LoreData data : LoreLoader.INSTANCE.getLore()) {
@@ -32,6 +27,7 @@ public class ClientTickHandler {
 			}
 			long endTime = System.nanoTime() - startTime;
 			LoreExpansion.logger.info("Finished preloading sounds. Took " + TimeUnit.SECONDS.convert(endTime, TimeUnit.NANOSECONDS) + " seconds");
+			preload = false;
 		}
 	}
 

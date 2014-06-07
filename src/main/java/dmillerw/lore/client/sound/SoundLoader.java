@@ -35,7 +35,7 @@ public class SoundLoader {
 	/** File-name to be read */
 	private final String file;
 
-	public boolean loaded = false;
+	private boolean loaded = false;
 
 	public SoundLoader(String file) {
 		this.file = file;

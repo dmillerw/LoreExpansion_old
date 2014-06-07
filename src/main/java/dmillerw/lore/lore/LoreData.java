@@ -108,16 +108,6 @@ public class LoreData {
 		return global || sound.containsKey(dimension);
 	}
 
-	public boolean shouldPreload() {
-		if (globalSound != null) {
-			if (!globalSound.loaded) return true;
-		}
-		for (Map.Entry<Integer, SoundLoader> entry : sound.entrySet()) {
-			if (!entry.getValue().loaded) return true;
-		}
-		return false;
-	}
-
 	public void preloadSounds() {
 		if (globalSound != null) {
 			globalSound.registerSound();
