@@ -1,6 +1,8 @@
 package dmillerw.lore.client.sound;
 
 import com.google.common.collect.Maps;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import dmillerw.lore.LoreExpansion;
 import net.minecraft.client.Minecraft;
@@ -20,6 +22,8 @@ public class SoundHandler {
 
 	private static final String[] SOUND_MANAGER_MAPPING = new String[] {"sndManager", "field_147694_f"};
 	private static final String[] SOUND_SYSTEM_MAPPING = new String[] {"sndSystem", "field_148620_e"};
+
+	private static boolean paused = false;
 
 	private Map<String, String> nameToTempMap = Maps.newHashMap();
 
@@ -80,5 +84,21 @@ public class SoundHandler {
 
 	public boolean isPlaying(String name) {
 		return nameToTempMap.containsKey(name) && nameToTempMap.get(name).equals(nowPlaying);
+	}
+
+	@SubscribeEvent
+	public void onClientTick(TickEvent.ClientTickEvent event) {
+		boolean currentState = false;
+		if (Minecraft.getMinecraft().isGamePaused()) {
+			currentState = true;
+		}
+
+		if (currentState && !paused) {
+			getSoundSystem().pause(nowPlaying);
+			paused = true;
+		} else if (!currentState && paused) {
+			getSoundSystem().play(nowPlaying);
+			paused = false;
+		}
 	}
 }
