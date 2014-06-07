@@ -1,5 +1,6 @@
 package dmillerw.lore.lore;
 
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dmillerw.lore.LoreExpansion;
@@ -9,6 +10,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author dmillerw
@@ -53,12 +55,12 @@ public class LoreLoader {
 		gson = builder.create();
 	}
 
-	private LoreData[] lore = new LoreData[MAX];
+	private Map<Integer, LoreData> lore = Maps.newHashMap();
 
 	private LoreData.DeserializedLoreTag loreTags = new LoreData.DeserializedLoreTag();
 
 	public LoreData[] getLore() {
-		return lore;
+		return lore.values().toArray(new LoreData[lore.size()]);
 	}
 
 	public String getTag(int dimension) {
@@ -66,24 +68,30 @@ public class LoreLoader {
 	}
 
 	public LoreData getLore(int page) {
-		if (lore[page] == null) {
-			lore[page] = new LoreData();
-			lore[page].page = page;
+		if (!lore.containsKey(page)) {
+			LoreData data = new LoreData();
+			data.page = page;
+			lore.put(page, data);
 		}
-		return lore[page];
+		return lore.get(page);
 	}
 
 	public void clear() {
-		lore = new LoreData[MAX];
+		lore.clear();
 		loreTags = new LoreData.DeserializedLoreTag();
 	}
 
 	public void loadLore(File file) throws Exception {
 		LoreData.DeserializedLore data = gson.fromJson(new FileReader(file), LoreData.DeserializedLore.class);
+		// Make sure page is positive and above 0
+		if (data.page <= 0) {
+			LoreExpansion.logger.warn(String.format("Page number in %s must be above 0. Setting to 1", file.getName()));
+			data.page = 1;
+		}
 		// Check to see if file exists
 		File audio = new File(LoreExpansion.audioFolder, data.sound);
 		if (!audio.exists() || !audio.isFile()) {
-			LoreExpansion.logger.warn("Could not find " + data.sound + " as defined in " + file.getName());
+			LoreExpansion.logger.warn(String.format("Could not find %s as defined in %s", data.sound, file.getName()));
 			data.sound = "";
 		}
 		LoreData lore = getLore(data.page);

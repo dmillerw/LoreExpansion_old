@@ -80,7 +80,7 @@ public class ItemLoreScrap extends Item {
 			}
 
 			if (data != null && data.validForDimension(dimension)) {
-				list.add(data.getTitle(dimension));
+				list.add(String.format("Page %s: %s", stack.getItemDamage(), data.getTitle(dimension)));
 			}
 		}
 	}
