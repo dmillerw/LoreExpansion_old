@@ -20,7 +20,7 @@ public class ClientProxy extends CommonProxy {
 	public void preInit(FMLPreInitializationEvent event) {
 		Configuration config = new Configuration(new File(LoreExpansion.configFolder, "config.cfg"));
 		config.load();
-		boolean preload = config.get(Configuration.CATEGORY_GENERAL, "preload", true, "Preload all lore sounds when the game starts. Will induce additional startup lag, but prevents lag during game.").getBoolean(true);
+		boolean preload = config.get(Configuration.CATEGORY_GENERAL, "preload", false, "Preload all lore sounds when the game starts. Will induce additional startup lag, but prevents lag during game.").getBoolean(false);
 		config.save();
 
 		FMLCommonHandler.instance().bus().register(KeyHandler.INSTANCE);
