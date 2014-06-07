@@ -11,6 +11,7 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import dmillerw.lore.command.CommandLore;
 import dmillerw.lore.core.GuiHandler;
+import dmillerw.lore.core.handler.DefaultFileHandler;
 import dmillerw.lore.core.handler.PlayerTickHandler;
 import dmillerw.lore.core.proxy.CommonProxy;
 import dmillerw.lore.item.ItemJournal;
@@ -70,6 +71,7 @@ public class LoreExpansion {
 			audioFolder.mkdir();
 		}
 
+		DefaultFileHandler.initialize();
 		LoreLoader.initialize();
 
 		PacketHandler.init();

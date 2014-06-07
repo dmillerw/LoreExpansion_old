@@ -17,7 +17,6 @@ import net.minecraftforge.common.MinecraftForge;
 
 import java.lang.reflect.Method;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author dmillerw
@@ -66,19 +65,9 @@ public class SoundLoader {
 	}
 
 	@SideOnly(Side.CLIENT)
-	public void registerSoundThreaded() {
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				registerSound();
-			}
-		}).start();
-	}
-
-	@SideOnly(Side.CLIENT)
 	public ISound getSound() {
 		if (!loaded) {
-			registerSoundThreaded();
+			registerSound();
 			loaded = true;
 		}
 

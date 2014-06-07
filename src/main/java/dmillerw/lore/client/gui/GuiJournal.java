@@ -2,6 +2,7 @@ package dmillerw.lore.client.gui;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import dmillerw.lore.LoreExpansion;
+import dmillerw.lore.client.sound.SoundLoader;
 import dmillerw.lore.lore.LoreData;
 import dmillerw.lore.lore.LoreLoader;
 import net.minecraft.client.gui.GuiScreen;
@@ -110,7 +111,8 @@ public class GuiJournal extends GuiScreen {
 		// AUDIO CONTROL
 		GL11.glColor4f(1, 1, 1, 1);
 		if (data != null) {
-			if (data.getSound(dimension).isPlaying()) {
+			SoundLoader sound = data.getSound(dimension);
+			if (sound.isPlaying()) {
 				drawTexturedModalRect(left + XSIZE / 2 + 41, top + 204, 170, 192, 5, 5); // STOP
 				drawTexturedModalRect(left + XSIZE / 2 + 122, top + 203, 177, 184, 4, 7); // START
 			} else {

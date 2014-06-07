@@ -4,6 +4,8 @@ import dmillerw.lore.lore.LoreLoader;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 
 /**
  * @author dmillerw
@@ -29,6 +31,9 @@ public class CommandLore extends CommandBase {
 		if (args[0].equalsIgnoreCase("reload")) {
 			LoreLoader.INSTANCE.clear();
 			LoreLoader.initialize();
+
+			sender.addChatMessage(new ChatComponentText("WARNING: Due to various oddities within Minecraft, this will NOT reload sound! That requires a restart of the client."));
+			sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Reloaded Lore"));
 		}
 	}
 }
