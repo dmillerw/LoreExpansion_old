@@ -89,10 +89,12 @@ public class LoreLoader {
 			data.page = 1;
 		}
 		// Check to see if file exists
-		File audio = new File(LoreExpansion.audioFolder, data.sound);
-		if (!audio.exists() || !audio.isFile()) {
-			LoreExpansion.logger.warn(String.format("Could not find %s audio file as defined in %s", data.sound, file.getName()));
-			data.sound = "";
+		if (!data.sound.isEmpty()) {
+			File audio = new File(LoreExpansion.audioFolder, data.sound);
+			if (!audio.exists() || !audio.isFile()) {
+				LoreExpansion.logger.warn(String.format("Could not find %s audio file as defined in %s", data.sound, file.getName()));
+				data.sound = "";
+			}
 		}
 		LoreData lore = getLore(data.page);
 		lore.addLore(data);
