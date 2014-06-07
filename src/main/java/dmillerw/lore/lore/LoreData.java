@@ -96,15 +96,15 @@ public class LoreData {
 	}
 
 	public boolean hasTitle(int dimension) {
-		return global || title.containsKey(dimension);
+		return !globalTitle.isEmpty() || title.containsKey(dimension);
 	}
 
 	public boolean hasLore(int dimension) {
-		return global || lore.containsKey(dimension);
+		return !globalLore.isEmpty() || lore.containsKey(dimension);
 	}
 
 	public boolean hasSound(int dimension) {
-		return global || sound.containsKey(dimension);
+		return !globalSound.isEmpty() || sound.containsKey(dimension);
 	}
 
 	@Override
