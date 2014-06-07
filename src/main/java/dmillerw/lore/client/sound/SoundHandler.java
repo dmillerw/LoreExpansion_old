@@ -85,7 +85,8 @@ public class SoundHandler {
 		}
 
 		getSoundSystem().stop(nowPlaying);
-		getSoundSystem().removeSource(nowPlaying);
+//		getSoundSystem().removeSource(nowPlaying);
+//		isLoaded.remove(nowPlaying);
 		nowPlaying = "";
 		gamePause = false;
 		paused = false;
