@@ -47,13 +47,6 @@ public class GuiJournal extends GuiScreen {
 
 	public GuiJournal(EntityPlayer player) {
 		this.player = player;
-
-		// PRELOADING - JUST IN CASE
-		for (LoreData data : LoreLoader.INSTANCE.getLore()) {
-			if (data != null) {
-				data.preloadSounds();
-			}
-		}
 	}
 
 	@Override
