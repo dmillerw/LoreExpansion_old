@@ -2,7 +2,7 @@ package dmillerw.lore.client.gui;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import dmillerw.lore.LoreExpansion;
-import dmillerw.lore.client.sound.SoundLoader;
+import dmillerw.lore.client.sound.SoundHandler;
 import dmillerw.lore.lore.LoreData;
 import dmillerw.lore.lore.LoreLoader;
 import net.minecraft.client.gui.GuiScreen;
@@ -40,11 +40,11 @@ public class GuiJournal extends GuiScreen {
 
 	private static int selectedLore = -1;
 
+	private static int scrollIndex = 0;
+
 	private final EntityPlayer player;
 
 	private List<String> currentLore = new ArrayList<String>();
-
-	private int scrollIndex = 0;
 
 	public GuiJournal(EntityPlayer player) {
 		this.player = player;
@@ -111,8 +111,8 @@ public class GuiJournal extends GuiScreen {
 		// AUDIO CONTROL
 		GL11.glColor4f(1, 1, 1, 1);
 		if (data != null) {
-			SoundLoader sound = data.getSound(dimension);
-			if (sound.isPlaying()) {
+			String sound = data.getSound(dimension);
+			if (SoundHandler.INSTANCE.isPlaying(sound)) {
 				drawTexturedModalRect(left + XSIZE / 2 + 41, top + 204, 170, 192, 5, 5); // STOP
 				drawTexturedModalRect(left + XSIZE / 2 + 122, top + 203, 177, 184, 4, 7); // START
 			} else {
@@ -227,13 +227,14 @@ public class GuiJournal extends GuiScreen {
 		}
 
 		if (data != null) {
-			if (data.getSound(dimension).isPlaying()) {
+			String sound = data.getSound(dimension);
+			if (SoundHandler.INSTANCE.isPlaying(sound)) {
 				if (inBounds(left + XSIZE / 2 + 41, top + 204, 5, 5, x, y)) {
-					data.getSound(dimension).stop();
+					SoundHandler.INSTANCE.stop();
 				}
 			} else {
 				if (inBounds(left + XSIZE / 2 + 122, top + 203, 4, 7, x, y)) {
-					data.getSound(dimension).start();
+					SoundHandler.INSTANCE.play(sound);
 				}
 			}
 		}
