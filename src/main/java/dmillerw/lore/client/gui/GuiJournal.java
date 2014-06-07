@@ -57,6 +57,13 @@ public class GuiJournal extends GuiScreen {
 	}
 
 	@Override
+	public void initGui() {
+		if (selectedLore >= 0) {
+			loadLore(selectedLore);
+		}
+	}
+
+	@Override
 	public void drawScreen(int x, int y, float f) {
 		onWheelScrolled(Mouse.getDWheel());
 
@@ -203,30 +210,7 @@ public class GuiJournal extends GuiScreen {
 				}
 
 				if (inBounds(drawX, drawY, 16, 16, mouseX, mouseY)) {
-					currentLore.clear();
-					selectedLore = page;
-
-					String[] lore = LoreLoader.INSTANCE.getLore(selectedLore).getLore(dimension).split("[\r\n]");
-					List<String> newList = new ArrayList<String>();
-
-					for (int i=0; i<lore.length; i++) {
-						String str = lore[i];
-
-						if (!str.isEmpty()) {
-							str = str.trim();
-							str = str.replace("\t", "");
-							str = "     " + str;
-							newList.add(str);
-							if (i != lore.length - 1) {
-								newList.add("");
-							}
-						}
-					}
-
-					for (String str : newList) {
-						currentLore.addAll(mc.fontRenderer.listFormattedStringToWidth(str, (int)(((XSIZE / 2) - 45) / SCALE)));
-					}
-
+					loadLore(page);
 					scrollIndex = 0;
 					break;
 				}
@@ -257,6 +241,32 @@ public class GuiJournal extends GuiScreen {
 					data.getSound(dimension).start();
 				}
 			}
+		}
+	}
+
+	public void loadLore(int page) {
+		currentLore.clear();
+		selectedLore = page;
+
+		String[] lore = LoreLoader.INSTANCE.getLore(selectedLore).getLore(FMLClientHandler.instance().getClient().theWorld.provider.dimensionId).split("[\r\n]");
+		List<String> newList = new ArrayList<String>();
+
+		for (int i=0; i<lore.length; i++) {
+			String str = lore[i];
+
+			if (!str.isEmpty()) {
+				str = str.trim();
+				str = str.replace("\t", "");
+				str = "     " + str;
+				newList.add(str);
+				if (i != lore.length - 1) {
+					newList.add("");
+				}
+			}
+		}
+
+		for (String str : newList) {
+			currentLore.addAll(mc.fontRenderer.listFormattedStringToWidth(str, (int)(((XSIZE / 2) - 45) / SCALE)));
 		}
 	}
 

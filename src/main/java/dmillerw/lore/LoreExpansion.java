@@ -6,15 +6,16 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
+import dmillerw.lore.command.CommandLore;
 import dmillerw.lore.core.GuiHandler;
 import dmillerw.lore.core.handler.PlayerTickHandler;
 import dmillerw.lore.core.proxy.CommonProxy;
 import dmillerw.lore.item.ItemJournal;
 import dmillerw.lore.item.ItemLoreScrap;
 import dmillerw.lore.lore.LoreLoader;
-import dmillerw.lore.misc.FileHelper;
 import dmillerw.lore.network.NetworkEventHandler;
 import dmillerw.lore.network.PacketHandler;
 import net.minecraft.item.Item;
@@ -22,7 +23,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * @author dmillerw
@@ -42,6 +42,7 @@ public class LoreExpansion {
 	@SidedProxy(serverSide = "dmillerw.lore.core.proxy.CommonProxy", clientSide = "dmillerw.lore.core.proxy.ClientProxy")
 	public static CommonProxy proxy;
 
+	public static File configFolder;
 	public static File loreFolder;
 	public static File audioFolder;
 
@@ -56,37 +57,20 @@ public class LoreExpansion {
 		journal = new ItemJournal().setUnlocalizedName("journal");
 		GameRegistry.registerItem(journal, "journal");
 
-		loreFolder = new File(event.getModConfigurationDirectory(), CONFIG_FOLDER + "/" + LORE_FOLDER);
+		configFolder = new File(event.getModConfigurationDirectory(), CONFIG_FOLDER);
+		loreFolder = new File(configFolder, LORE_FOLDER);
 		audioFolder = new File(loreFolder, AUDIO_FOLDER);
+		if (!configFolder.exists()) {
+			configFolder.mkdir();
+		}
 		if (!loreFolder.exists()) {
-			loreFolder.mkdirs();
+			loreFolder.mkdir();
 		}
 		if (!audioFolder.exists()) {
 			audioFolder.mkdir();
 		}
 
-		for (File file : loreFolder.listFiles()) {
-			if (FileHelper.isJSONFile(file)) {
-				try {
-					LoreLoader.INSTANCE.loadLore(file);
-				} catch (Exception ex) {
-					logger.warn(String.format("Failed to parse %s", file.getName()));
-					ex.printStackTrace();
-				}
-			}
-		}
-
-		File tagFile = new File(event.getModConfigurationDirectory(), CONFIG_FOLDER + "/tags.json");
-		if (tagFile.exists()) {
-			LoreLoader.INSTANCE.loadLoreTags(tagFile);
-		} else {
-			// Generate new file
-			try {
-				LoreLoader.INSTANCE.saveDefaultLoreTags(tagFile);
-			} catch (IOException ex) {
-				LoreExpansion.logger.warn(String.format("Failed to save default tags.json. This isn't a huge issue."));
-			}
-		}
+		LoreLoader.initialize();
 
 		PacketHandler.init();
 
@@ -106,4 +90,8 @@ public class LoreExpansion {
 		proxy.postInit(event);
 	}
 
+	@Mod.EventHandler
+	public void onServerStarting(FMLServerStartingEvent event) {
+		event.registerServerCommand(new CommandLore());
+	}
 }

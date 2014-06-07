@@ -2,6 +2,8 @@ package dmillerw.lore.lore;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import dmillerw.lore.LoreExpansion;
+import dmillerw.lore.misc.FileHelper;
 
 import java.io.File;
 import java.io.FileReader;
@@ -12,6 +14,30 @@ import java.io.IOException;
  * @author dmillerw
  */
 public class LoreLoader {
+
+	public static void initialize() {
+		for (File file : LoreExpansion.loreFolder.listFiles()) {
+			if (FileHelper.isJSONFile(file)) {
+				try {
+					LoreLoader.INSTANCE.loadLore(file);
+				} catch (Exception ex) {
+					LoreExpansion.logger.warn(String.format("Failed to parse %s", file.getName()));
+					ex.printStackTrace();
+				}
+			}
+		}
+
+		File tagFile = new File(LoreExpansion.configFolder + "/tags.json");
+		if (tagFile.exists()) {
+			LoreLoader.INSTANCE.loadLoreTags(tagFile);
+		} else {
+			try {
+				LoreLoader.INSTANCE.saveDefaultLoreTags(tagFile);
+			} catch (IOException ex) {
+				LoreExpansion.logger.warn(String.format("Failed to save default tags.json. This isn't a huge issue."));
+			}
+		}
+	}
 
 	private static final int MAX = 256;
 
@@ -47,20 +73,15 @@ public class LoreLoader {
 		return lore[page];
 	}
 
+	public void clear() {
+		lore = new LoreData[MAX];
+		loreTags = new LoreData.DeserializedLoreTag();
+	}
+
 	public void loadLore(File file) throws Exception {
 		LoreData.DeserializedLore data = gson.fromJson(new FileReader(file), LoreData.DeserializedLore.class);
 		LoreData lore = getLore(data.page);
 		lore.addLore(data);
-
-//		boolean result = lore.addLore(data);
-
-//		System.out.println(data);
-//
-//		if (result) {
-//			LoreExpansion.logger.info("Loaded " + file.getName() + " into page " + data.page + " as a " + (data.global ? "global" : "dimensional file (" + data.dimension + ")"));
-//		} else {
-//			LoreExpansion.logger.warn("Failed to load " + file.getName() + ". Global: " + data.global + " Page: " + data.page + " Dimension: " + data.dimension);
-//		}
 	}
 
 	public void loadLoreTags(File file) {
