@@ -14,7 +14,6 @@ import java.net.URL;
 public class DefaultFileHandler {
 
 	public static final String[] FILES = new String[] {
-		"tags.json",
 		"lore/tutorial.json",
 		"lore/audio/tutorial.ogg"
 	};
