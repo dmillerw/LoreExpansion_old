@@ -113,7 +113,7 @@ public class GuiJournal extends GuiScreen {
 
 		// AUDIO CONTROL
 		GL11.glColor4f(1, 1, 1, 1);
-		if (data != null) {
+		if (data != null && data.hasSound(dimension)) {
 			String sound = data.getSound(dimension);
 			if (SoundHandler.INSTANCE.isPlaying(sound)) {
 				drawTexturedModalRect(left + XSIZE / 2 + 41, top + 204, 170, 192, 5, 5); // STOP
@@ -240,7 +240,7 @@ public class GuiJournal extends GuiScreen {
 			data = LoreLoader.INSTANCE.getLore(selectedLore);
 		}
 
-		if (data != null) {
+		if (data != null && data.hasSound(dimension)) {
 			String sound = data.getSound(dimension);
 			if (SoundHandler.INSTANCE.isPlaying(sound)) {
 				if (inBounds(left + XSIZE / 2 + 41, top + 204, 5, 5, x, y)) {

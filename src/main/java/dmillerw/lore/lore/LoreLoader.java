@@ -80,6 +80,12 @@ public class LoreLoader {
 
 	public void loadLore(File file) throws Exception {
 		LoreData.DeserializedLore data = gson.fromJson(new FileReader(file), LoreData.DeserializedLore.class);
+		// Check to see if file exists
+		File audio = new File(LoreExpansion.audioFolder, data.sound);
+		if (!audio.exists() || !audio.isFile()) {
+			LoreExpansion.logger.warn("Could not find " + data.sound + " as definied in " + file.getName());
+			data.sound = "";
+		}
 		LoreData lore = getLore(data.page);
 		lore.addLore(data);
 	}
