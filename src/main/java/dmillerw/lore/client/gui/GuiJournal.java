@@ -4,11 +4,10 @@ import cpw.mods.fml.client.FMLClientHandler;
 import dmillerw.lore.LoreExpansion;
 import dmillerw.lore.client.sound.SoundHandler;
 import dmillerw.lore.core.proxy.ClientProxy;
-import dmillerw.lore.lore.data.Lore;
 import dmillerw.lore.lore.LoreLoader;
+import dmillerw.lore.lore.data.Lore;
 import dmillerw.lore.lore.data.LoreKey;
-import dmillerw.lore.network.PacketConfirmAutoplay;
-import dmillerw.lore.network.PacketHandler;
+import dmillerw.lore.network.PacketNotification;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -228,7 +227,7 @@ public class GuiJournal extends GuiScreen {
 				}
 
 				if (inBounds(drawX, drawY, 16, 16, mouseX, mouseY)) {
-					PacketHandler.INSTANCE.sendToServer(new PacketConfirmAutoplay(lore.page, lore.dimension));
+					PacketNotification.notify(lore.page, lore.dimension, PacketNotification.Server.CONFIRM_AUTOPLAY);
 					loadLore(key);
 					scrollIndex = 0;
 					break;
@@ -277,7 +276,7 @@ public class GuiJournal extends GuiScreen {
 		currentLore.clear();
 		selectedLore = key;
 
-		String[] lore = LoreLoader.INSTANCE.getLore(selectedLore).lore.split("[\r\n]");
+		String[] lore = LoreLoader.INSTANCE.getLore(selectedLore).body.split("[\r\n]");
 		List<String> newList = new ArrayList<String>();
 
 		for (int i=0; i<lore.length; i++) {

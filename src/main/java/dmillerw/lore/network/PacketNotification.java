@@ -13,12 +13,22 @@ import net.minecraft.world.World;
  */
 public class PacketNotification implements IMessage, IMessageHandler<PacketNotification, IMessage> {
 
+	public static void notify(int page, int dimension, byte type) {
+		PacketHandler.INSTANCE.sendToServer(new PacketNotification(page, dimension, type));
+	}
+
 	public static void notify(EntityPlayerMP player, int page, int dimension, byte type) {
 		PacketHandler.INSTANCE.sendTo(new PacketNotification(page, dimension, type), player);
 	}
 
-	public static final byte PICKUP = 0;
-	public static final byte AUTOPLAY = 1;
+	public static class Server {
+		public static final byte CONFIRM_AUTOPLAY = 0;
+	}
+
+	public static class Client {
+		public static final byte PICKUP = 0;
+		public static final byte AUTOPLAY = 1;
+	}
 
 	public int page;
 	public int dimension;
@@ -63,7 +73,7 @@ public class PacketNotification implements IMessage, IMessageHandler<PacketNotif
 		if (world == null) {
 			return null;
 		}
-		LoreExpansion.proxy.handleNotificationPacket(message);
+		LoreExpansion.proxy.handleNotificationPacket(message, ctx);
 		return null;
 	}
 }

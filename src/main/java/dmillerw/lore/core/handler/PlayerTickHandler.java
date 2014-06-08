@@ -53,11 +53,11 @@ public class PlayerTickHandler {
 							}
 							PlayerHandler.setLore(event.player, list);
 							PacketSyncLore.updateLore((EntityPlayerMP) event.player);
-							PacketNotification.notify((EntityPlayerMP) event.player, key.page, key.dimension, PacketNotification.PICKUP);
+							PacketNotification.notify((EntityPlayerMP) event.player, key.page, key.dimension, PacketNotification.Client.PICKUP);
 
 							CommandHandler ch = (CommandHandler) MinecraftServer.getServer().getCommandManager();
 							LoreCommandSender commandSender = new LoreCommandSender(event.player);
-							for (String str : data.commands) {
+							for (String str : data.commands.pickup) {
 								ch.executeCommand(commandSender, str);
 							}
 

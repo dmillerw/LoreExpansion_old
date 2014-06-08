@@ -1,6 +1,7 @@
 package dmillerw.lore.command;
 
-import net.minecraft.command.ICommandSender;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.command.server.CommandBlockLogic;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.IChatComponent;
@@ -9,7 +10,7 @@ import net.minecraft.world.World;
 /**
  * @author dmillerw
  */
-public class LoreCommandSender implements ICommandSender {
+public class LoreCommandSender extends CommandBlockLogic {
 
 	public EntityPlayer player;
 
@@ -19,16 +20,31 @@ public class LoreCommandSender implements ICommandSender {
 
 	@Override
 	public String getCommandSenderName() {
-		return player.getCommandSenderName();
+		return "Lore";
 	}
 
 	@Override
 	public IChatComponent func_145748_c_() {
-		return player.func_145748_c_();
+		return null;
 	}
 
 	@Override
 	public void addChatMessage(IChatComponent var1) {
+
+	}
+
+	@Override
+	public void func_145756_e() {
+
+	}
+
+	@Override
+	public int func_145751_f() {
+		return 0;
+	}
+
+	@Override
+	public void func_145757_a(ByteBuf var1) {
 
 	}
 

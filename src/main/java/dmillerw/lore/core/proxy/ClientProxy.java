@@ -4,12 +4,12 @@ import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import dmillerw.lore.client.sound.SoundHandler;
 import dmillerw.lore.core.handler.KeyHandler;
 import dmillerw.lore.lore.LoreLoader;
 import dmillerw.lore.lore.data.Lore;
 import dmillerw.lore.lore.data.LoreKey;
-import dmillerw.lore.network.PacketConfirmAutoplay;
 import dmillerw.lore.network.PacketHandler;
 import dmillerw.lore.network.PacketNotification;
 import net.minecraft.world.World;
@@ -33,13 +33,13 @@ public class ClientProxy extends CommonProxy {
 	}
 
 	@Override
-	public void handleNotificationPacket(PacketNotification packet) {
-		if (packet.type == PacketNotification.PICKUP) {
+	public void handleNotificationPacket(PacketNotification packet, MessageContext context) {
+		if (packet.type == PacketNotification.Client.PICKUP) {
 			ClientProxy.pickedUpPage = new LoreKey(packet.page, packet.dimension);
-			PacketHandler.INSTANCE.sendToServer(new PacketConfirmAutoplay(packet.page, packet.dimension));
+			PacketHandler.INSTANCE.sendToServer(new PacketNotification(packet.page, packet.dimension, PacketNotification.Server.CONFIRM_AUTOPLAY));
 		}
 
-		if (packet.type == PacketNotification.AUTOPLAY) {
+		if (packet.type == PacketNotification.Client.AUTOPLAY) {
 			LoreKey key = new LoreKey(packet.page, packet.dimension);
 			Lore lore = LoreLoader.INSTANCE.getLore(key);
 

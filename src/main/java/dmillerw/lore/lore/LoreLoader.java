@@ -7,6 +7,7 @@ import dmillerw.lore.LoreExpansion;
 import dmillerw.lore.lore.data.Lore;
 import dmillerw.lore.lore.data.LoreKey;
 import dmillerw.lore.lore.data.LoreTags;
+import dmillerw.lore.lore.json.CommandDeserializer;
 import dmillerw.lore.lore.json.LoreDeserializer;
 import dmillerw.lore.lore.json.TagDeserializer;
 import dmillerw.lore.lore.json.TagSerializer;
@@ -18,7 +19,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -60,6 +60,7 @@ public class LoreLoader {
 		builder.registerTypeAdapter(Lore.class, new LoreDeserializer());
 		builder.registerTypeAdapter(LoreTags.class, new TagDeserializer());
 		builder.registerTypeAdapter(LoreTags.class, new TagSerializer());
+		builder.registerTypeAdapter(Lore.CommandWrapper.class, new CommandDeserializer());
 		gson = builder.create();
 	}
 
@@ -117,7 +118,7 @@ public class LoreLoader {
 				data.sound = "";
 			}
 		}
-		System.out.println(Arrays.toString(data.commands));
+
 		LoreKey key = new LoreKey(data.page, data.dimension);
 		lore.put(key, data);
 	}

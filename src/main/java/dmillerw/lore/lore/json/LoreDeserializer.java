@@ -29,12 +29,12 @@ public class LoreDeserializer implements JsonDeserializer<Lore> {
 				data.dimension = element.getAsInt();
 			} else if (key.equalsIgnoreCase("title")) {
 				data.title = element.getAsString();
-			} else if (key.equalsIgnoreCase("lore")) {
-				data.lore = element.getAsString();
+			} else if (key.equalsIgnoreCase("body")) {
+				data.body = element.getAsString();
 			} else if (key.equalsIgnoreCase("sound")) {
 				data.sound = element.getAsString();
 			} else if (key.equalsIgnoreCase("commands")) {
-				data.commands = context.deserialize(element, new TypeToken<String[]>(){}.getType());
+				data.commands = context.deserialize(element, new TypeToken<Lore.CommandWrapper>(){}.getType());
 			} else if (key.equalsIgnoreCase("autoplay")) {
 				data.autoplay = element.getAsBoolean();
 			}
