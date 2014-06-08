@@ -15,7 +15,7 @@ import dmillerw.lore.core.handler.DefaultFileHandler;
 import dmillerw.lore.core.handler.PlayerTickHandler;
 import dmillerw.lore.core.proxy.CommonProxy;
 import dmillerw.lore.item.ItemJournal;
-import dmillerw.lore.item.ItemLoreScrap;
+import dmillerw.lore.item.ItemLorePage;
 import dmillerw.lore.lore.LoreLoader;
 import dmillerw.lore.network.NetworkEventHandler;
 import dmillerw.lore.network.PacketHandler;
@@ -52,8 +52,8 @@ public class LoreExpansion {
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		loreScrap = new ItemLoreScrap().setUnlocalizedName("scrap");
-		GameRegistry.registerItem(loreScrap, "scrap");
+		loreScrap = new ItemLorePage().setUnlocalizedName("page");
+		GameRegistry.registerItem(loreScrap, "page");
 
 		journal = new ItemJournal().setUnlocalizedName("journal");
 		GameRegistry.registerItem(journal, "journal");

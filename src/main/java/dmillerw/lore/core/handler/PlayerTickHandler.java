@@ -5,7 +5,7 @@ import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import dmillerw.lore.LoreExpansion;
 import dmillerw.lore.command.LoreCommandSender;
-import dmillerw.lore.item.ItemLoreScrap;
+import dmillerw.lore.item.ItemLorePage;
 import dmillerw.lore.lore.LoreLoader;
 import dmillerw.lore.lore.PlayerHandler;
 import dmillerw.lore.lore.data.Lore;
@@ -36,7 +36,7 @@ public class PlayerTickHandler {
 					ItemStack stack = event.player.inventory.getStackInSlot(i);
 
 					if (stack != null && stack.getItem() == LoreExpansion.loreScrap) {
-						LoreKey key = ItemLoreScrap.getLore(stack);
+						LoreKey key = ItemLorePage.getLore(stack);
 						if (key != null) {
 							Lore data = LoreLoader.INSTANCE.getLore(key);
 

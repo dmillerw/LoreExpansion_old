@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * @author dmillerw
  */
-public class ItemLoreScrap extends Item {
+public class ItemLorePage extends Item {
 
 	public static void setLore(ItemStack stack, LoreKey key) {
 		if (!stack.hasTagCompound()) {
@@ -48,7 +48,7 @@ public class ItemLoreScrap extends Item {
 
 	private IIcon icon;
 
-	public ItemLoreScrap() {
+	public ItemLorePage() {
 		super();
 
 		setMaxDamage(0);
@@ -61,7 +61,7 @@ public class ItemLoreScrap extends Item {
 	public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
 		if (!world.isRemote) {
 			if (player.capabilities.isCreativeMode) {
-				LoreKey key = ItemLoreScrap.getLore(stack);
+				LoreKey key = ItemLorePage.getLore(stack);
 				if (key != null) {
 					Lore data = LoreLoader.INSTANCE.getLore(key);
 
@@ -88,7 +88,7 @@ public class ItemLoreScrap extends Item {
 
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean debug) {
-		LoreKey key = ItemLoreScrap.getLore(stack);
+		LoreKey key = ItemLorePage.getLore(stack);
 		if (key != null) {
 			int dimension = player.worldObj.provider.dimensionId;
 			Lore data = LoreLoader.INSTANCE.getLore(key);
@@ -110,7 +110,7 @@ public class ItemLoreScrap extends Item {
 		for (Lore data : LoreLoader.INSTANCE.getAllLore()) {
 			if (data != null && data.validDimension(dimension)) {
 				ItemStack stack = new ItemStack(this);
-				ItemLoreScrap.setLore(stack, new LoreKey(data));
+				ItemLorePage.setLore(stack, new LoreKey(data));
 				list.add(stack);
 			}
 		}
