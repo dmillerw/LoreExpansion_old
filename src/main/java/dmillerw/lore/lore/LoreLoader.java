@@ -12,6 +12,7 @@ import dmillerw.lore.lore.json.LoreDeserializer;
 import dmillerw.lore.lore.json.TagDeserializer;
 import dmillerw.lore.lore.json.TagSerializer;
 import dmillerw.lore.misc.FileHelper;
+import net.minecraftforge.common.DimensionManager;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.File;
@@ -71,7 +72,7 @@ public class LoreLoader {
 	public int[] getAllDimensions() {
 		List<Integer> list = new ArrayList<Integer>();
 		for (Lore lore : getAllLore()) {
-			if (lore.dimension != Integer.MAX_VALUE && !list.contains(lore.dimension)) {
+			if (!list.contains(lore.dimension)) {
 				list.add(lore.dimension);
 			}
 		}
@@ -82,8 +83,16 @@ public class LoreLoader {
 		return lore.values().toArray(new Lore[lore.size()]);
 	}
 
+	private String getDimensionName(int dimension) {
+		return dimension == Integer.MAX_VALUE ? "Global" : DimensionManager.getProvider(dimension).getDimensionName();
+	}
+
 	public String getLoreTag(int dimension) {
-		return loreTags.mapping.containsKey(dimension) ? loreTags.mapping.get(dimension) : loreTags.defaultTag;
+		String tag = loreTags.defaultTag;
+		if (loreTags.mapping.containsKey(dimension)) {
+			tag = loreTags.mapping.get(dimension);
+		}
+		return String.format(tag, getDimensionName(dimension));
 	}
 
 	public Lore getLore(int page, int dimension) {

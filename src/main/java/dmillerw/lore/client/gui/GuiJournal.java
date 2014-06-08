@@ -1,15 +1,14 @@
 package dmillerw.lore.client.gui;
 
-import cpw.mods.fml.client.FMLClientHandler;
 import dmillerw.lore.LoreExpansion;
 import dmillerw.lore.client.sound.SoundHandler;
+import dmillerw.lore.client.texture.SubTexture;
 import dmillerw.lore.core.proxy.ClientProxy;
 import dmillerw.lore.lore.LoreLoader;
 import dmillerw.lore.lore.data.Lore;
 import dmillerw.lore.lore.data.LoreKey;
-import dmillerw.lore.network.PacketNotification;
+import dmillerw.lore.misc.Pair;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.IIcon;
@@ -30,27 +29,63 @@ public class GuiJournal extends GuiScreen {
 	private static final ResourceLocation JOURNAL_LEFT = new ResourceLocation("loreexp:textures/gui/journal_left.png");
 	private static final ResourceLocation JOURNAL_RIGHT = new ResourceLocation("loreexp:textures/gui/journal_right.png");
 
-	private static final int XSIZE = 336;
-	private static final int YSIZE = 230;
-	private static final int XSTART = 29;
-	private static final int YSTART = 46;
-	private static final int TEXT_Y = 24;
-	private static final int SLOT_GAP = 23;
+	private static final SubTexture LORE_BOX_SELECTED = new SubTexture(JOURNAL_LEFT, 185, 45, 18, 18);
+	private static final SubTexture LORE_BOX_ACTIVE = new SubTexture(JOURNAL_LEFT, 185, 68, 18, 18);
+	private static final SubTexture ARROW_DIMENSION_BACK = new SubTexture(JOURNAL_LEFT, 191, 162, 7, 8);
+	private static final SubTexture ARROW_DIMENSION_BACK_MOUSEOVER = new SubTexture(JOURNAL_LEFT, 191, 175, 7, 8);
+	private static final SubTexture ARROW_DIMENSION_FORWARD = new SubTexture(JOURNAL_LEFT, 205, 162, 7, 8);
+	private static final SubTexture ARROW_DIMENSION_FORWARD_MOUSEOVER = new SubTexture(JOURNAL_LEFT, 205, 175, 7, 8);
+	private static final SubTexture ARROW_PAGE_BACK = new SubTexture(JOURNAL_LEFT, 186, 191, 12, 12);
+	private static final SubTexture ARROW_PAGE_BACK_MOUSEOVER = new SubTexture(JOURNAL_LEFT, 186, 207, 12, 12);
+	private static final SubTexture ARROW_PAGE_FORWARD = new SubTexture(JOURNAL_LEFT, 205, 191, 12, 12);
+	private static final SubTexture ARROW_PAGE_FORWARD_MOUSEOVER = new SubTexture(JOURNAL_LEFT, 205, 207, 12, 12);
+	private static final SubTexture ARROW_SCROLL_UP = new SubTexture(JOURNAL_RIGHT, 168, 37, 13, 6);
+	private static final SubTexture ARROW_SCROLL_DOWN = new SubTexture(JOURNAL_RIGHT, 168, 203, 13, 6);
+	private static final SubTexture PLAY_BUTTON_ACTIVE = new SubTexture(JOURNAL_RIGHT, 177, 191, 4, 7);
+	private static final SubTexture PLAY_BUTTON_INACTIVE = new SubTexture(JOURNAL_RIGHT, 177, 184, 4, 7);
+	private static final SubTexture PAUSE_BUTTON_ACTIVE = new SubTexture(JOURNAL_RIGHT, 183, 192, 5, 5);
+	private static final SubTexture PAUSE_BUTTON_INACTIVE = new SubTexture(JOURNAL_RIGHT, 177, 185, 5, 5);
+	private static final SubTexture STOP_BUTTON_ACTIVE = new SubTexture(JOURNAL_RIGHT, 170, 192, 5, 5);
+	private static final SubTexture STOP_BUTTON_INACTIVE = new SubTexture(JOURNAL_RIGHT, 170, 185, 5, 5);
+
+	private static final Pair<Integer, Integer> LEFT_SIZE = new Pair<Integer, Integer>(175, 230);
+	private static final Pair<Integer, Integer> RIGHT_SIZE = new Pair<Integer, Integer>(168, 230);
+	private static final Pair<Integer, Integer> TOTAL_SIZE = new Pair<Integer, Integer>(LEFT_SIZE.left + RIGHT_SIZE.left, 230);
+	private static final Pair<Integer, Integer> BOX_START = new Pair<Integer, Integer>(35, 45);
+	private static final Pair<Integer, Integer> TAB_SIZE = new Pair<Integer, Integer>(15, 26);
+	private static final Pair<Integer, Integer> TAB_BACK = new Pair<Integer, Integer>(0, 16);
+	private static final Pair<Integer, Integer> TAB_FORWARD = new Pair<Integer, Integer>(0, 46);
+	private static final Pair<Integer, Integer> ARROW_DIMENSION_BACK_POS = new Pair<Integer, Integer>(5, 25);
+	private static final Pair<Integer, Integer> ARROW_DIMENSION_FORWARD_POS = new Pair<Integer, Integer>(5, 55);
+	private static final Pair<Integer, Integer> ARROW_PAGE_SIZE = new Pair<Integer, Integer>(12, 12);
+	private static final Pair<Integer, Integer> ARROW_PAGE_BACK_POS = new Pair<Integer, Integer>(20, 206);
+	private static final Pair<Integer, Integer> ARROW_PAGE_FORWARD_POS = new Pair<Integer, Integer>(148, 206);
+	private static final Pair<Integer, Integer> PLAY_POS = new Pair<Integer, Integer>(122, 203);
+	private static final Pair<Integer, Integer> PAUSE_POS = new Pair<Integer, Integer>(122, 204);
+	private static final Pair<Integer, Integer> STOP_POS = new Pair<Integer, Integer>(41, 204);
+
+	private static final float TEXT_SCALE = 0.651F;
+
+	private static final int TITLE_Y = 24;
+	private static final int BODY_X = 20;
+	private static final int BODY_y = 40;
+	private static final int LORE_BOX_GAP = 22;
 	private static final int LORE_ROW_COUNT = 17;
+	private static final int ARROW_SCROLL_X = 78;
+	private static final int ARROW_SCROLL_UP_Y = 37;
+	private static final int ARROW_SCROLL_DOWN_Y = 203;
 
-	private static final float SCALE = 0.651F;
-	
-	public static List<LoreKey> loreCache = new ArrayList<LoreKey>();
+	public static int scrollIndex = 0;
+	public static List<LoreKey> loreCache;
+	public static LoreKey selectedLore;
 
-	public static LoreKey selectedLore = null;
+	private static int[] dimensions = new int[] {Integer.MAX_VALUE};
 
-	private static int selectedDimension = Integer.MIN_VALUE;
-
-	private static int scrollIndex = 0;
-
-	private final EntityPlayer player;
+	private static int dimensionIndex = Integer.MIN_VALUE;
 
 	private List<String> currentLore = new ArrayList<String>();
+
+	private final EntityPlayer player;
 
 	public GuiJournal(EntityPlayer player) {
 		this.player = player;
@@ -58,13 +93,28 @@ public class GuiJournal extends GuiScreen {
 
 	@Override
 	public void initGui() {
-		if (selectedLore != null) {
-			loadLore(selectedLore);
-			ClientProxy.pickedUpPage = null;
+		// Fill dimensions array and set index
+		int[] dims = LoreLoader.INSTANCE.getAllDimensions();
+		if (dims.length > 0) {
+			GuiJournal.dimensions = dims;
 		}
 
-		if (selectedDimension == Integer.MIN_VALUE) {
-			selectedDimension = FMLClientHandler.instance().getClient().theWorld.provider.dimensionId;
+		if (dimensionIndex == Integer.MIN_VALUE || dimensionIndex >= dimensions.length) {
+			dimensionIndex = 0;
+		}
+
+		// Open selected page
+		if (selectedLore != null) {
+			for (int i=0; i<dimensions.length; i++) {
+				if (dimensions[i] == selectedLore.dimension) {
+					dimensionIndex = i;
+					loadLore(selectedLore);
+					ClientProxy.pickedUpPage = null;
+					return;
+				}
+			}
+			selectedLore = null;
+			ClientProxy.pickedUpPage = null;
 		}
 	}
 
@@ -72,204 +122,241 @@ public class GuiJournal extends GuiScreen {
 	public void drawScreen(int x, int y, float f) {
 		onWheelScrolled(Mouse.getDWheel());
 
-		// BACKGROUND
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		int left = (width - XSIZE) / 2;
-		int top = (height - YSIZE) / 2;
-		mc.getTextureManager().bindTexture(JOURNAL_LEFT);
-		drawTexturedModalRect(left, top, 0, 0, XSIZE / 2, YSIZE);
-		mc.getTextureManager().bindTexture(JOURNAL_RIGHT);
-		drawTexturedModalRect(left + XSIZE / 2, top, 0, 0, XSIZE / 2, YSIZE);
-
-		int startX = left + XSTART;
-		int startY = top + YSTART;
-		int mouseX = (x - startX);
-		int mouseY = (y - startY);
-		int dimension = FMLClientHandler.instance().getClient().theWorld.provider.dimensionId;
-
-		Lore data = null;
+		// VARIABLES
+		int left = (width - TOTAL_SIZE.left) / 2;
+		int top = (height - TOTAL_SIZE.right) / 2;
+		Lore current = null;
 		if (selectedLore != null) {
-			data = LoreLoader.INSTANCE.getLore(selectedLore);
+			current = LoreLoader.INSTANCE.getLore(selectedLore);
+
+			if (current == null) {
+				selectedLore = null;
+			}
+		}
+		Lore[] all = LoreLoader.INSTANCE.getAllLore();
+		int dimension = dimensions[dimensionIndex];
+
+		// BACKGROUND
+		GL11.glColor4f(1, 1, 1, 1);
+		mc.getTextureManager().bindTexture(JOURNAL_LEFT);
+		drawTexturedModalRect(left, top, 0, 0, LEFT_SIZE.left, LEFT_SIZE.right);
+		mc.getTextureManager().bindTexture(JOURNAL_RIGHT);
+		drawTexturedModalRect(left + LEFT_SIZE.left, top, 0, 0, RIGHT_SIZE.left, RIGHT_SIZE.right);
+
+		// LORE BACKGROUNDS
+		for (Lore lore : all) {
+			if (lore != null && lore.validDimension(dimension)) {
+				int drawX = (((lore.page - 1) % 4) * LORE_BOX_GAP);
+				int drawY = 0;
+				if ((lore.page - 1) > 4) {
+					drawY = (((lore.page - 1) / 4) * LORE_BOX_GAP);
+				}
+
+				if (selectedLore != null && selectedLore.page == lore.page) {
+					LORE_BOX_ACTIVE.draw(left + BOX_START.left + drawX, top + BOX_START.right + drawY, (int) zLevel);
+				} else {
+					LORE_BOX_SELECTED.draw(left + BOX_START.left + drawX, top + BOX_START.right + drawY, (int) zLevel);
+				}
+			}
 		}
 
-		// TEXT RENDERING
-		drawCenteredString(LoreLoader.INSTANCE.getLoreTag(dimension), left + (XSIZE / 4), top + TEXT_Y, 0x000000);
-		if (data != null) {
-			drawCenteredString(data.title, (int) (left + XSIZE * 0.75F), top + TEXT_Y, 0x000000);
+		// LORE ICONS
+		mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
+		IIcon icon = LoreExpansion.loreScrap.getIconFromDamage(0);
+		for (LoreKey key : loreCache) {
+			Lore lore = LoreLoader.INSTANCE.getLore(key);
+			if (lore != null && lore.validDimension(dimension)) {
+				int drawX = (((lore.page - 1) % 4) * LORE_BOX_GAP);
+				int drawY = 0;
+				if ((lore.page - 1) > 4) {
+					drawY = (((lore.page - 1) / 4) * LORE_BOX_GAP);
+				}
+
+				drawTexturedModelRectFromIcon(left + BOX_START.left + drawX + 1, top + BOX_START.right + drawY + 1, icon, 16, 16);
+			}
+		}
+
+		// AUDIO CONTROL
+		if (current != null && !current.sound.isEmpty()) {
+			String sound = current.sound;
+			if (SoundHandler.INSTANCE.isPlaying(sound)) {
+				STOP_BUTTON_ACTIVE.draw(left + LEFT_SIZE.left + STOP_POS.left, top + STOP_POS.right, (int)zLevel);
+				if (SoundHandler.INSTANCE.isPaused()) {
+					PLAY_BUTTON_ACTIVE.draw(left + LEFT_SIZE.left + PLAY_POS.left, top + PLAY_POS.right, (int)zLevel);
+				} else {
+					PAUSE_BUTTON_ACTIVE.draw(left + LEFT_SIZE.left + PAUSE_POS.left, top + PAUSE_POS.right, (int)zLevel);
+				}
+			} else {
+				STOP_BUTTON_INACTIVE.draw(left + LEFT_SIZE.left + STOP_POS.left, top + STOP_POS.right, (int)zLevel);
+				PLAY_BUTTON_ACTIVE.draw(left + LEFT_SIZE.left + PLAY_POS.left, top + PLAY_POS.right, (int)zLevel);
+			}
+		} else {
+			STOP_BUTTON_INACTIVE.draw(left + LEFT_SIZE.left + STOP_POS.left, top + STOP_POS.right, (int)zLevel);
+			PLAY_BUTTON_INACTIVE.draw(left + LEFT_SIZE.left + PLAY_POS.left, top + PLAY_POS.right, (int)zLevel);
+		}
+
+		// ARROWS - SCROLL
+		GL11.glColor4f(1, 1, 1, 1);
+		if (current != null) {
+			if (scrollIndex > 0) {
+				ARROW_SCROLL_UP.draw(left + LEFT_SIZE.left + ARROW_SCROLL_X, top + ARROW_SCROLL_UP_Y, (int)zLevel);
+			}
+
+			if (currentLore.size() - LORE_ROW_COUNT > scrollIndex) {
+				ARROW_SCROLL_DOWN.draw(left + LEFT_SIZE.left + ARROW_SCROLL_X, top + ARROW_SCROLL_DOWN_Y, (int)zLevel);
+			}
+		}
+
+		// ARROWS - DIMENSION
+		if (inBounds(left + TAB_BACK.left, top + TAB_BACK.right, TAB_SIZE.left, TAB_SIZE.right, x, y)) {
+			ARROW_DIMENSION_BACK_MOUSEOVER.draw(left + ARROW_DIMENSION_BACK_POS.left, top + ARROW_DIMENSION_BACK_POS.right, (int)zLevel);
+		} else {
+			ARROW_DIMENSION_BACK.draw(left + ARROW_DIMENSION_BACK_POS.left, top + ARROW_DIMENSION_BACK_POS.right, (int)zLevel);
+		}
+
+		if (inBounds(left + TAB_FORWARD.left, top + TAB_FORWARD.right, TAB_SIZE.left, TAB_SIZE.right, x, y)) {
+			ARROW_DIMENSION_FORWARD_MOUSEOVER.draw(left + ARROW_DIMENSION_FORWARD_POS.left, top + ARROW_DIMENSION_FORWARD_POS.right, (int)zLevel);
+		} else {
+			ARROW_DIMENSION_FORWARD.draw(left + ARROW_DIMENSION_FORWARD_POS.left, top + ARROW_DIMENSION_FORWARD_POS.right, (int)zLevel);
+		}
+
+		// ARROWS - PAGE
+		if (inBounds(left + ARROW_PAGE_BACK_POS.left, top + ARROW_PAGE_BACK_POS.right, ARROW_PAGE_SIZE.left, ARROW_PAGE_SIZE.right, x, y)) {
+			ARROW_PAGE_BACK_MOUSEOVER.draw(left + ARROW_PAGE_BACK_POS.left, top + ARROW_PAGE_BACK_POS.right, (int)zLevel);
+		} else {
+			ARROW_PAGE_BACK.draw(left + ARROW_PAGE_BACK_POS.left, top + ARROW_PAGE_BACK_POS.right, (int)zLevel);
+		}
+
+		if (inBounds(left + ARROW_PAGE_FORWARD_POS.left, top + ARROW_PAGE_FORWARD_POS.right, ARROW_PAGE_SIZE.left, ARROW_PAGE_SIZE.right, x, y)) {
+			ARROW_PAGE_FORWARD_MOUSEOVER.draw(left + ARROW_PAGE_FORWARD_POS.left, top + ARROW_PAGE_FORWARD_POS.right, (int)zLevel);
+		} else {
+			ARROW_PAGE_FORWARD.draw(left + ARROW_PAGE_FORWARD_POS.left, top + ARROW_PAGE_FORWARD_POS.right, (int)zLevel);
+		}
+
+		// LORE TOOLTIPS
+		for (LoreKey key : loreCache) {
+			Lore lore = LoreLoader.INSTANCE.getLore(key);
+			if (lore != null && lore.validDimension(dimension)) {
+				int drawX = (((lore.page - 1) % 4) * LORE_BOX_GAP);
+				int drawY = 0;
+				if ((lore.page - 1) > 4) {
+					drawY = (((lore.page - 1) / 4) * LORE_BOX_GAP);
+				}
+
+				if (inBounds(left + BOX_START.left + drawX, top + BOX_START.right + drawY, 16, 16, x, y)) {
+					drawHoveringText(Arrays.asList(lore.title), x, y, mc.fontRenderer);
+				}
+			}
+		}
+
+		// TEXT - LEFT
+		String tag = LoreLoader.INSTANCE.getLoreTag(dimension);
+		drawCenteredString(tag, (left + (LEFT_SIZE.left - 8) / 2) + 8, top + TITLE_Y, 0x000000);
+
+		// TEXT - RIGHT
+		if (current != null) {
+			drawCenteredString(current.title, left + LEFT_SIZE.left + (RIGHT_SIZE.left / 2), top + TITLE_Y, 0x000000);
 			boolean unicodeCache = mc.fontRenderer.getUnicodeFlag();
 			mc.fontRenderer.setUnicodeFlag(false);
 			for (int i=scrollIndex; i<Math.min(scrollIndex + LORE_ROW_COUNT, currentLore.size()); i++) {
 				String lore = currentLore.get(i);
-				drawString(lore, left + 190, (top + 40 + fontRendererObj.FONT_HEIGHT) + fontRendererObj.FONT_HEIGHT * (i - scrollIndex), SCALE, 0x000000);
+				drawString(lore, left + LEFT_SIZE.left + BODY_X, (top + BODY_y + fontRendererObj.FONT_HEIGHT) + fontRendererObj.FONT_HEIGHT * (i - scrollIndex), TEXT_SCALE, 0x000000);
 			}
 			mc.fontRenderer.setUnicodeFlag(unicodeCache);
-		}
-
-		// ARROWS
-		GL11.glColor4f(1, 1, 1, 1);
-		mc.getTextureManager().bindTexture(JOURNAL_RIGHT);
-		if (data != null && scrollIndex > 0) {
-			drawTexturedModalRect(left + XSIZE / 2 + 78, top + 37, 168, 37, 13, 6);
-		}
-		if (data != null && currentLore.size() - LORE_ROW_COUNT > scrollIndex) {
-			drawTexturedModalRect(left + XSIZE / 2 + 78, top + 203, 168, 203, 13, 6);
-		}
-
-		// AUDIO CONTROL
-		GL11.glColor4f(1, 1, 1, 1);
-		if (data != null) {
-			String sound = data.sound;
-
-			if (!sound.isEmpty()) {
-				if (SoundHandler.INSTANCE.isPlaying(sound)) {
-					drawTexturedModalRect(left + XSIZE / 2 + 41, top + 204, 170, 192, 5, 5); // STOP
-					if (SoundHandler.INSTANCE.isPaused()) {
-						drawTexturedModalRect(left + XSIZE / 2 + 122, top + 204, 183, 185, 5, 5); // PAUSE
-					} else {
-						drawTexturedModalRect(left + XSIZE / 2 + 122, top + 204, 183, 192, 5, 5); // PAUSE
-					}
-				} else {
-					drawTexturedModalRect(left + XSIZE / 2 + 41, top + 204, 170, 185, 5, 5); // STOP
-					drawTexturedModalRect(left + XSIZE / 2 + 122, top + 203, 177, 191, 4, 7); // START
-				}
-			}
-		}
-
-		Lore[] allLore = LoreLoader.INSTANCE.getAllLore();
-
-		// LORE ICON BACKGROUNDS
-		GL11.glColor4f(1, 1, 1, 1);
-		OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-		GL11.glEnable(GL11.GL_BLEND);
-		mc.getTextureManager().bindTexture(JOURNAL_LEFT);
-		for (Lore lore : allLore) {
-			if (lore != null && lore.validDimension(selectedDimension)) {
-				int page = lore.page;
-
-				int drawX = (((page - 1) % 4) * SLOT_GAP);
-				int drawY = 0;
-
-				if ((page - 1) > 4) {
-					drawY = (((page - 1) / 4) * SLOT_GAP);
-				}
-
-				if (selectedLore != null && page == selectedLore.page) {
-					drawTexturedModalRect(startX + drawX - 1, startY + drawY - 1, 178, 68, 18, 18);
-				} else {
-					drawTexturedModalRect(startX + drawX - 1, startY + drawY - 1, 178, 45, 18, 18);
-				}
-			}
-		}
-		GL11.glDisable(GL11.GL_BLEND);
-
-		// LORE ICONS
-		GL11.glColor4f(1, 1, 1, 1);
-		IIcon icon = LoreExpansion.loreScrap.getIconFromDamage(0);
-		mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
-		for (LoreKey key : loreCache) {
-			Lore lore = LoreLoader.INSTANCE.getLore(key);
-
-			if (lore.validDimension(selectedDimension)) {
-				int drawX = (((key.page - 1) % 4) * SLOT_GAP);
-				int drawY = 0;
-
-				if ((key.page - 1) > 4) {
-					drawY = (((key.page - 1) / 4) * SLOT_GAP);
-				}
-
-				drawTexturedModelRectFromIcon(startX + drawX, startY + drawY, icon, 16, 16);
-			}
-		}
-
-		// LORE TOOLTIPS
-		GL11.glColor4f(1, 1, 1, 1);
-		for (LoreKey key : loreCache) {
-			Lore lore = LoreLoader.INSTANCE.getLore(key);
-
-			if (lore.validDimension(selectedDimension)) {
-				int drawX = (((key.page - 1) % 4) * SLOT_GAP);
-				int drawY = 0;
-
-				if ((key.page - 1) > 4) {
-					drawY = (((key.page - 1) / 4) * SLOT_GAP);
-				}
-
-				if (inBounds(drawX, drawY, 16, 16, mouseX, mouseY)) {
-					drawHoveringText(Arrays.asList(LoreLoader.INSTANCE.getLore(key).title), mouseX + startX, mouseY + startY, mc.fontRenderer);
-				}
-			}
 		}
 	}
 
 	@Override
 	protected void mouseClicked(int x, int y, int button) {
-		if (button != 0) {
-			return;
+		int left = (width - TOTAL_SIZE.left) / 2;
+		int top = (height - TOTAL_SIZE.right) / 2;
+		Lore current = null;
+		if (selectedLore != null) {
+			current = LoreLoader.INSTANCE.getLore(selectedLore);
+
+			if (current == null) {
+				selectedLore = null;
+			}
 		}
+		int dimension = dimensions[dimensionIndex];
 
-		int left = (width - XSIZE) / 2;
-		int top = (height - YSIZE) / 2;
-		int startX = left + XSTART;
-		int startY = top + YSTART;
-		int mouseX = (x - startX);
-		int mouseY = (y - startY);
-
-		// LORE PICKING
 		for (LoreKey key : loreCache) {
 			Lore lore = LoreLoader.INSTANCE.getLore(key);
-
-			if (lore.validDimension(selectedDimension)) {
-				int drawX = (((key.page - 1) % 4) * SLOT_GAP);
+			if (lore != null && lore.validDimension(dimension)) {
+				int drawX = (((lore.page - 1) % 4) * LORE_BOX_GAP);
 				int drawY = 0;
-
-				if ((key.page - 1) > 4) {
-					drawY = (((key.page - 1) / 4) * SLOT_GAP);
+				if ((lore.page - 1) > 4) {
+					drawY = (((lore.page - 1) / 4) * LORE_BOX_GAP);
 				}
 
-				if (inBounds(drawX, drawY, 16, 16, mouseX, mouseY)) {
-					PacketNotification.notify(lore.page, lore.dimension, PacketNotification.Server.CONFIRM_AUTOPLAY);
-					loadLore(key);
-					scrollIndex = 0;
-					break;
+				if (inBounds(left + BOX_START.left + drawX, top + BOX_START.right + drawY, 16, 16, x, y)) {
+					selectedLore = new LoreKey(lore.page, dimension);
+					loadLore(selectedLore);
 				}
 			}
 		}
 
-		// SCROLLING
-		if (inBounds(left + XSIZE / 2 + 78, top + 37, 13, 16, x, y)) {
-			scroll(-1);
-		}
-		if (inBounds(left + XSIZE / 2 + 78, top + 203, 13, 16, x, y)) {
-			scroll(1);
-		}
-
 		// AUDIO CONTROL
-		Lore data = null;
-		if (selectedLore != null) {
-			data = LoreLoader.INSTANCE.getLore(selectedLore);
-		}
-
-		if (data != null) {
-			String sound = data.sound;
-
-			if (data.hasSound()) {
+		if (current != null) {
+			String sound = current.sound;
+			if (!sound.isEmpty()) {
 				if (SoundHandler.INSTANCE.isPlaying(sound)) {
-					if (inBounds(left + XSIZE / 2 + 41, top + 204, 5, 5, x, y)) {
+					if (inBounds(left + LEFT_SIZE.left + STOP_POS.left, top + STOP_POS.right, 5, 5, x, y)) {
 						SoundHandler.INSTANCE.stop();
-					} else if (inBounds(left + XSIZE / 2 + 122, top + 203, 4, 7, x, y)) {
+					} else if (inBounds(left + LEFT_SIZE.left + PLAY_POS.left, top + PLAY_POS.right, 4, 7, x, y)) {
 						if (!SoundHandler.INSTANCE.isPaused()) {
 							SoundHandler.INSTANCE.pause();
 						} else {
 							SoundHandler.INSTANCE.resume();
 						}
 					}
-				} else {
-					if (inBounds(left + XSIZE / 2 + 122, top + 203, 4, 7, x, y)) {
-						SoundHandler.INSTANCE.play(sound);
-					}
+				} else if (inBounds(left + LEFT_SIZE.left + PLAY_POS.left, top + PLAY_POS.right, 4, 7, x, y)) {
+					SoundHandler.INSTANCE.play(sound);
 				}
 			}
 		}
+
+		// ARROWS - SCROLL
+		if (current != null) {
+			if (inBounds(left + LEFT_SIZE.left + ARROW_SCROLL_X, top + ARROW_SCROLL_UP_Y, 13, 16, x, y)) {
+				scroll(-1);
+			}
+
+			if (inBounds(left + LEFT_SIZE.left + ARROW_SCROLL_X, top + ARROW_SCROLL_DOWN_Y, 13, 16, x, y)) {
+				scroll(1);
+			}
+		}
+
+		// ARROWS - DIMENSION
+		if (inBounds(left + TAB_BACK.left, top + TAB_BACK.right, TAB_SIZE.left, TAB_SIZE.right, x, y)) {
+			if (dimensionIndex <= 0) {
+				dimensionIndex = dimensions.length - 1;
+			} else {
+				dimensionIndex--;
+			}
+
+			reset();
+		}
+
+		if (inBounds(left + TAB_FORWARD.left, top + TAB_FORWARD.right, TAB_SIZE.left, TAB_SIZE.right, x, y)) {
+			if (dimensionIndex >= dimensions.length - 1) {
+				dimensionIndex = 0;
+			} else {
+				dimensionIndex++;
+			}
+
+			reset();
+		}
+
+		// ARROWS - PAGE
+		//TODO
+	}
+
+	public void reset() {
+		selectedLore = null;
+		scrollIndex = 0;
+		currentLore.clear();
+		SoundHandler.INSTANCE.stop();
 	}
 
 	public void loadLore(LoreKey key) {
@@ -294,7 +381,7 @@ public class GuiJournal extends GuiScreen {
 		}
 
 		for (String str : newList) {
-			currentLore.addAll(mc.fontRenderer.listFormattedStringToWidth(str, (int)(((XSIZE / 2) - 45) / SCALE)));
+			currentLore.addAll(mc.fontRenderer.listFormattedStringToWidth(str, (int)(((RIGHT_SIZE.left) - 45) / TEXT_SCALE)));
 		}
 	}
 
@@ -322,14 +409,14 @@ public class GuiJournal extends GuiScreen {
 
 	public void scroll(int theta) {
 		if (theta < 0) {
-			scrollIndex--;
+			scrollIndex -= 2;
 			if (scrollIndex < 0) {
 				scrollIndex = 0;
 			}
 		}
 
 		if (theta > 0) {
-			scrollIndex++;
+			scrollIndex += 2;
 			if (scrollIndex > Math.max(0, currentLore.size() - LORE_ROW_COUNT)) {
 				scrollIndex = Math.max(0, currentLore.size() - LORE_ROW_COUNT);
 			}
@@ -357,13 +444,6 @@ public class GuiJournal extends GuiScreen {
 		GL11.glPushMatrix();
 		GL11.glScalef(mult, mult, 1.0F);
 		fontRendererObj.drawString(str, (int) ((x) / mult), (int) ((y) / mult), color);
-		GL11.glPopMatrix();
-	}
-
-	public void drawSplitString(String str, int x, int y, int max, float mult, int color) {
-		GL11.glPushMatrix();
-		GL11.glScalef(mult, mult, 1.0F);
-		fontRendererObj.drawSplitString(str, (int) ((x) / mult), (int) ((y) / mult), (int) ((max) / mult), color);
 		GL11.glPopMatrix();
 	}
 }

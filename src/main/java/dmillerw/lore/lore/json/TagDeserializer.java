@@ -29,7 +29,9 @@ public class TagDeserializer implements JsonDeserializer<LoreTags> {
 					int dimension = Integer.parseInt(key);
 					tag.mapping.put(dimension, element.getAsString());
 				} catch (NumberFormatException ex) {
-					// Invalid, should log
+					if (key.equalsIgnoreCase("global")) {
+						tag.mapping.put(Integer.MAX_VALUE, element.getAsString());
+					}
 				}
 			}
 		}

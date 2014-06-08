@@ -1,6 +1,5 @@
 package dmillerw.lore.item;
 
-import cpw.mods.fml.client.FMLClientHandler;
 import dmillerw.lore.LoreExpansion;
 import dmillerw.lore.core.TabLore;
 import dmillerw.lore.lore.LoreLoader;
@@ -18,6 +17,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
 
 import java.util.List;
 
@@ -90,7 +90,6 @@ public class ItemLorePage extends Item {
 	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean debug) {
 		LoreKey key = ItemLorePage.getLore(stack);
 		if (key != null) {
-			int dimension = player.worldObj.provider.dimensionId;
 			Lore data = LoreLoader.INSTANCE.getLore(key);
 
 			if (data == null) {
@@ -100,15 +99,19 @@ public class ItemLorePage extends Item {
 
 			if (data != null) {
 				list.add(String.format("Page %s: %s", key.page, data.title));
+				if (key.dimension == Integer.MAX_VALUE) {
+					list.add("Global");
+				} else {
+					list.add("Dimension: " + DimensionManager.getProvider(data.dimension).getDimensionName());
+				}
 			}
 		}
 	}
 
 	@Override
 	public void getSubItems(Item item, CreativeTabs tab, List list) {
-		int dimension = FMLClientHandler.instance().getClient().theWorld.provider.dimensionId;
 		for (Lore data : LoreLoader.INSTANCE.getAllLore()) {
-			if (data != null && data.validDimension(dimension)) {
+			if (data != null) {
 				ItemStack stack = new ItemStack(this);
 				ItemLorePage.setLore(stack, new LoreKey(data));
 				list.add(stack);
