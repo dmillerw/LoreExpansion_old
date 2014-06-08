@@ -29,9 +29,7 @@ public class LoreCommandSender implements ICommandSender {
 
 	@Override
 	public void addChatMessage(IChatComponent var1) {
-		if (getEntityWorld().getWorldInfo().getGameRulesInstance().getGameRuleBooleanValue("commandBlockOutput")) {
-			player.addChatMessage(var1);
-		}
+
 	}
 
 	@Override
