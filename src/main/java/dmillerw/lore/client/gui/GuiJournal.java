@@ -156,7 +156,7 @@ public class GuiJournal extends GuiScreen {
 			if (lore != null && lore.validDimension(dimension)) {
 				int page = lore.page - (4 * loreScrollIndex);
 
-				if (page > 0 && page <= 35) {
+				if (page > 0 && page < 35) {
 					int drawX = (((page - 1) % 4) * LORE_BOX_GAP);
 					int drawY = 0;
 					if ((page - 1) > 4) {
@@ -180,7 +180,7 @@ public class GuiJournal extends GuiScreen {
 			if (lore != null && lore.validDimension(dimension)) {
 				int page = lore.page - (4 * loreScrollIndex);
 
-				if (page > 0 && page <= 35) {
+				if (page > 0 && page < 35) {
 					int drawX = (((page - 1) % 4) * LORE_BOX_GAP);
 					int drawY = 0;
 					if ((page - 1) > 4) {
@@ -255,7 +255,7 @@ public class GuiJournal extends GuiScreen {
 			if (lore != null && lore.validDimension(dimension)) {
 				int page = lore.page - (4 * loreScrollIndex);
 
-				if (page > 0 && page <= 35) {
+				if (page > 0 && page < 35) {
 					int drawX = (((page - 1) % 4) * LORE_BOX_GAP);
 					int drawY = 0;
 					if ((page - 1) > 4) {
@@ -302,7 +302,7 @@ public class GuiJournal extends GuiScreen {
 			if (lore != null && lore.validDimension(dimension)) {
 				int page = lore.page - (4 * loreScrollIndex);
 
-				if (page > 0 && page <= 35) {
+				if (page > 0 && page < 35) {
 					int drawX = (((page - 1) % 4) * LORE_BOX_GAP);
 					int drawY = 0;
 					if ((page - 1) > 4) {
