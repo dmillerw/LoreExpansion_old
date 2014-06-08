@@ -1,5 +1,6 @@
 package dmillerw.lore.lore.json;
 
+import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -32,6 +33,8 @@ public class LoreDeserializer implements JsonDeserializer<Lore> {
 				data.lore = element.getAsString();
 			} else if (key.equalsIgnoreCase("sound")) {
 				data.sound = element.getAsString();
+			} else if (key.equalsIgnoreCase("commands")) {
+				data.commands = context.deserialize(element, new TypeToken<String[]>(){}.getType());
 			} else if (key.equalsIgnoreCase("autoplay")) {
 				data.autoplay = element.getAsBoolean();
 			}

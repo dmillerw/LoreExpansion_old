@@ -10,6 +10,7 @@ public class Lore {
 	public String title = "";
 	public String lore = "";
 	public String sound = "";
+	public String[] commands = new String[0];
 	public boolean autoplay = false;
 
 	public boolean hasSound() {
