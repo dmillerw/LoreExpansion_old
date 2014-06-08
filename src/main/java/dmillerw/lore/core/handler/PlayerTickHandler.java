@@ -4,17 +4,19 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import dmillerw.lore.LoreExpansion;
-import dmillerw.lore.lore.LoreData;
+import dmillerw.lore.item.ItemLoreScrap;
 import dmillerw.lore.lore.LoreLoader;
 import dmillerw.lore.lore.PlayerHandler;
-import dmillerw.lore.network.PacketNotifyOfPickup;
+import dmillerw.lore.lore.data.Lore;
+import dmillerw.lore.lore.data.LoreKey;
+import dmillerw.lore.network.PacketNotification;
 import dmillerw.lore.network.PacketSyncLore;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import org.lwjgl.input.Keyboard;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,27 +33,24 @@ public class PlayerTickHandler {
 					ItemStack stack = event.player.inventory.getStackInSlot(i);
 
 					if (stack != null && stack.getItem() == LoreExpansion.loreScrap) {
-						if (stack.getItemDamage() > 0) {
-							LoreData data = LoreLoader.INSTANCE.getLore(stack.getItemDamage());
+						LoreKey key = ItemLoreScrap.getLore(stack);
+						if (key != null) {
+							Lore data = LoreLoader.INSTANCE.getLore(key);
 
-							if (data == null || (data.contents.isEmpty() && !data.global)) {
-								LoreExpansion.logger.warn("Found item with invalid lore ID. Resetting");
-								stack.setItemDamage(0);
+							if (data == null) {
+								LoreExpansion.logger.warn("Found item with invalid lore. Resetting");
+								stack.setTagCompound(new NBTTagCompound());
 								return;
 							}
 
-							List<Integer> list = PlayerHandler.getLore(event.player);
+							List<LoreKey> list = PlayerHandler.getLore(event.player);
 
-							if (list == null) {
-								list = new ArrayList<Integer>();
-							}
-
-							if (!list.contains(stack.getItemDamage())) {
-								list.add(stack.getItemDamage());
+							if (!list.contains(key)) {
+								list.add(key);
 							}
 							PlayerHandler.setLore(event.player, list);
 							PacketSyncLore.updateLore((EntityPlayerMP) event.player);
-							PacketNotifyOfPickup.notify((EntityPlayerMP) event.player, data.page);
+							PacketNotification.notify((EntityPlayerMP) event.player, key.page, key.dimension, PacketNotification.PICKUP);
 
 							if (!notifiedThisTick) {
 								event.player.addChatComponentMessage(new ChatComponentText("You've discovered a new lore page. Press " + Keyboard.getKeyName(KeyHandler.INSTANCE.key.getKeyCode()) + " to view"));

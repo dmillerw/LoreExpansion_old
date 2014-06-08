@@ -6,7 +6,12 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import dmillerw.lore.client.sound.SoundHandler;
 import dmillerw.lore.core.handler.KeyHandler;
-import dmillerw.lore.network.PacketNotifyOfPickup;
+import dmillerw.lore.lore.LoreLoader;
+import dmillerw.lore.lore.data.Lore;
+import dmillerw.lore.lore.data.LoreKey;
+import dmillerw.lore.network.PacketConfirmAutoplay;
+import dmillerw.lore.network.PacketHandler;
+import dmillerw.lore.network.PacketNotification;
 import net.minecraft.world.World;
 
 /**
@@ -14,7 +19,7 @@ import net.minecraft.world.World;
  */
 public class ClientProxy extends CommonProxy {
 
-	public static int pickedUpPage = -1;
+	public static LoreKey pickedUpPage;
 
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
@@ -28,8 +33,20 @@ public class ClientProxy extends CommonProxy {
 	}
 
 	@Override
-	public void handlePickupPacket(PacketNotifyOfPickup packet) {
-		pickedUpPage = packet.page;
+	public void handleNotificationPacket(PacketNotification packet) {
+		if (packet.type == PacketNotification.PICKUP) {
+			ClientProxy.pickedUpPage = new LoreKey(packet.page, packet.dimension);
+			PacketHandler.INSTANCE.sendToServer(new PacketConfirmAutoplay(packet.page, packet.dimension));
+		}
+
+		if (packet.type == PacketNotification.AUTOPLAY) {
+			LoreKey key = new LoreKey(packet.page, packet.dimension);
+			Lore lore = LoreLoader.INSTANCE.getLore(key);
+
+			if (!lore.sound.isEmpty()) {
+				SoundHandler.INSTANCE.play(lore.sound);
+			}
+		}
 	}
 
 	@Override

@@ -13,7 +13,8 @@ public class PacketHandler {
 
 	public static void init() {
 		INSTANCE.registerMessage(PacketSyncLore.class, PacketSyncLore.class, 0, Side.CLIENT);
-		INSTANCE.registerMessage(PacketNotifyOfPickup.class, PacketNotifyOfPickup.class, 1, Side.CLIENT);
+		INSTANCE.registerMessage(PacketNotification.class, PacketNotification.class, 1, Side.CLIENT);
+		INSTANCE.registerMessage(PacketConfirmAutoplay.class, PacketConfirmAutoplay.class, 2, Side.SERVER);
 	}
 
 }

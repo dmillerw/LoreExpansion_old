@@ -4,12 +4,21 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dmillerw.lore.LoreExpansion;
+import dmillerw.lore.lore.data.Lore;
+import dmillerw.lore.lore.data.LoreKey;
+import dmillerw.lore.lore.data.LoreTags;
+import dmillerw.lore.lore.json.LoreDeserializer;
+import dmillerw.lore.lore.json.TagDeserializer;
+import dmillerw.lore.lore.json.TagSerializer;
 import dmillerw.lore.misc.FileHelper;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,48 +50,59 @@ public class LoreLoader {
 		}
 	}
 
-	private static final int MAX = 256;
-
 	public static final LoreLoader INSTANCE = new LoreLoader();
 
 	private static Gson gson;
 
 	static {
 		GsonBuilder builder = new GsonBuilder();
-		builder.registerTypeAdapter(LoreData.DeserializedLore.class, new LoreDeserializer());
-		builder.registerTypeAdapter(LoreData.DeserializedLoreTag.class, new TagDeserializer());
-		builder.registerTypeAdapter(LoreData.DeserializedLoreTag.class, new TagSerializer());
+		builder.registerTypeAdapter(Lore.class, new LoreDeserializer());
+		builder.registerTypeAdapter(LoreTags.class, new TagDeserializer());
+		builder.registerTypeAdapter(LoreTags.class, new TagSerializer());
 		gson = builder.create();
 	}
 
-	private Map<Integer, LoreData> lore = Maps.newHashMap();
+	private Map<LoreKey, Lore> lore = Maps.newHashMap();
 
-	private LoreData.DeserializedLoreTag loreTags = new LoreData.DeserializedLoreTag();
+	private LoreTags loreTags = new LoreTags();
 
-	public LoreData[] getLore() {
-		return lore.values().toArray(new LoreData[lore.size()]);
+	public int[] getAllDimensions() {
+		List<Integer> list = new ArrayList<Integer>();
+		for (Lore lore : getAllLore()) {
+			if (lore.dimension != Integer.MAX_VALUE && !list.contains(lore.dimension)) {
+				list.add(lore.dimension);
+			}
+		}
+		return ArrayUtils.toPrimitive(list.toArray(new Integer[list.size()]));
 	}
 
-	public String getTag(int dimension) {
+	public Lore[] getAllLore() {
+		return lore.values().toArray(new Lore[lore.size()]);
+	}
+
+	public String getLoreTag(int dimension) {
 		return loreTags.mapping.containsKey(dimension) ? loreTags.mapping.get(dimension) : loreTags.defaultTag;
 	}
 
-	public LoreData getLore(int page) {
-		if (!lore.containsKey(page)) {
-			LoreData data = new LoreData();
-			data.page = page;
-			lore.put(page, data);
+	public Lore getLore(int page, int dimension) {
+		LoreKey key = new LoreKey(page, dimension);
+		return getLore(key);
+	}
+
+	public Lore getLore(LoreKey key) {
+		if (!lore.containsKey(key)) {
+			return null;
 		}
-		return lore.get(page);
+		return lore.get(key);
 	}
 
 	public void clear() {
 		lore.clear();
-		loreTags = new LoreData.DeserializedLoreTag();
+		loreTags = new LoreTags();
 	}
 
 	public void loadLore(File file) throws Exception {
-		LoreData.DeserializedLore data = gson.fromJson(new FileReader(file), LoreData.DeserializedLore.class);
+		Lore data = gson.fromJson(new FileReader(file), Lore.class);
 		// Make sure page is positive and above 0
 		if (data.page <= 0) {
 			LoreExpansion.logger.warn(String.format("Page number in %s must be above 0. Setting to 1", file.getName()));
@@ -90,27 +110,27 @@ public class LoreLoader {
 		}
 		// Check to see if file exists
 		if (!data.sound.isEmpty()) {
-			File audio = new File(LoreExpansion.audioFolder, data.sound);
+			File audio = new File(LoreExpansion.audioFolder, data.sound + ".ogg");
 			if (!audio.exists() || !audio.isFile()) {
 				LoreExpansion.logger.warn(String.format("Could not find %s audio file as defined in %s", data.sound, file.getName()));
 				data.sound = "";
 			}
 		}
-		LoreData lore = getLore(data.page);
-		lore.addLore(data);
+		LoreKey key = new LoreKey(data.page, data.dimension);
+		lore.put(key, data);
 	}
 
 	public void loadLoreTags(File file) {
 		try {
-			loreTags = gson.fromJson(new FileReader(file), LoreData.DeserializedLoreTag.class);
+			loreTags = gson.fromJson(new FileReader(file), LoreTags.class);
 		} catch (IOException ex) {
 			// LOG ERROR
 		}
 	}
 
 	public void saveDefaultLoreTags(File file) throws IOException {
-		LoreData.DeserializedLoreTag defaultTags = new LoreData.DeserializedLoreTag();
-		String json = gson.toJson(defaultTags, LoreData.DeserializedLoreTag.class);
+		LoreTags defaultTags = new LoreTags();
+		String json = gson.toJson(defaultTags, LoreTags.class);
 		FileWriter writer = new FileWriter(file);
 		writer.append(json);
 		writer.close();

@@ -34,7 +34,7 @@ public class KeyHandler {
 		}
 		if (event.phase == TickEvent.Phase.START) {
 			if (key.getIsKeyPressed() && FMLClientHandler.instance().getClient().inGameHasFocus) {
-				if (ClientProxy.pickedUpPage != -1) {
+				if (ClientProxy.pickedUpPage != null) {
 					GuiJournal.selectedLore = ClientProxy.pickedUpPage;
 				}
 				event.player.openGui(LoreExpansion.instance, GuiHandler.GUI_JOURNAL, event.player.worldObj, 0, 0, 0);

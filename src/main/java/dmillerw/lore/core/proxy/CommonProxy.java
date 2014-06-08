@@ -2,7 +2,7 @@ package dmillerw.lore.core.proxy;
 
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import dmillerw.lore.network.PacketNotifyOfPickup;
+import dmillerw.lore.network.PacketNotification;
 import net.minecraft.world.World;
 
 /**
@@ -18,7 +18,7 @@ public class CommonProxy {
 
 	}
 
-	public void handlePickupPacket(PacketNotifyOfPickup packet) {
+	public void handleNotificationPacket(PacketNotification packet) {
 		// Shouldn't ever happen, and does nothing anyway :D
 	}
 
