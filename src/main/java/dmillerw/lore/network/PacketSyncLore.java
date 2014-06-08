@@ -81,8 +81,8 @@ public class PacketSyncLore implements IMessage, IMessageHandler<PacketSyncLore,
 		}
 		Entity entity = world.getEntityByID(message.player);
 		if (entity != null && entity instanceof EntityPlayer) {
-			GuiJournal.loreCache = message.lore;
-			if (!GuiJournal.loreCache.contains(GuiJournal.selectedLore)) {
+			GuiJournal.playerLore = message.lore;
+			if (!GuiJournal.playerLore.contains(GuiJournal.selectedLore)) {
 				GuiJournal.selectedLore = null;
 				SoundHandler.INSTANCE.stop(); // Just in case
 			}

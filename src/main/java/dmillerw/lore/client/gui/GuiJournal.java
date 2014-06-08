@@ -72,14 +72,17 @@ public class GuiJournal extends GuiScreen {
 	private static final int TITLE_Y = 24;
 	private static final int BODY_X = 20;
 	private static final int BODY_y = 35;
-	private static final int LORE_BOX_GAP = 22;
+	private static final int LORE_BOX_GAP = 23;
 	private static final int LORE_ROW_COUNT = 17;
 	private static final int ARROW_SCROLL_X = 78;
 	private static final int ARROW_SCROLL_UP_Y = 37;
 	private static final int ARROW_SCROLL_DOWN_Y = 203;
 
-	public static int scrollIndex = 0;
-	public static List<LoreKey> loreCache;
+	public static int maxPage = 0;
+
+	public static int loreScrollIndex = 0;
+	public static int textScrollIndex = 0;
+	public static List<LoreKey> playerLore;
 	public static LoreKey selectedLore;
 
 	private static int[] dimensions = new int[] {Integer.MAX_VALUE};
@@ -106,6 +109,8 @@ public class GuiJournal extends GuiScreen {
 			dimensionIndex = 0;
 		}
 
+		reset();
+
 		// Open selected page
 		if (selectedLore != null) {
 			for (int i=0; i<dimensions.length; i++) {
@@ -123,7 +128,7 @@ public class GuiJournal extends GuiScreen {
 
 	@Override
 	public void drawScreen(int x, int y, float f) {
-		onWheelScrolled(Mouse.getDWheel());
+		onWheelScrolled(x, y, Mouse.getDWheel());
 
 		// VARIABLES
 		int left = (width - TOTAL_SIZE.left) / 2;
@@ -149,16 +154,20 @@ public class GuiJournal extends GuiScreen {
 		// LORE BACKGROUNDS
 		for (Lore lore : all) {
 			if (lore != null && lore.validDimension(dimension)) {
-				int drawX = (((lore.page - 1) % 4) * LORE_BOX_GAP);
-				int drawY = 0;
-				if ((lore.page - 1) > 4) {
-					drawY = (((lore.page - 1) / 4) * LORE_BOX_GAP);
-				}
+				int page = lore.page - (4 * loreScrollIndex);
 
-				if (selectedLore != null && selectedLore.page == lore.page) {
-					LORE_BOX_ACTIVE.draw(left + BOX_START.left + drawX, top + BOX_START.right + drawY, (int) zLevel);
-				} else {
-					LORE_BOX_SELECTED.draw(left + BOX_START.left + drawX, top + BOX_START.right + drawY, (int) zLevel);
+				if (page > 0 && page <= 35) {
+					int drawX = (((page - 1) % 4) * LORE_BOX_GAP);
+					int drawY = 0;
+					if ((page - 1) > 4) {
+						drawY = (((page - 1) / 4) * LORE_BOX_GAP);
+					}
+
+					if (selectedLore != null && selectedLore.page == lore.page) {
+						LORE_BOX_ACTIVE.draw(left + BOX_START.left + drawX, top + BOX_START.right + drawY, (int) zLevel);
+					} else {
+						LORE_BOX_SELECTED.draw(left + BOX_START.left + drawX, top + BOX_START.right + drawY, (int) zLevel);
+					}
 				}
 			}
 		}
@@ -166,16 +175,20 @@ public class GuiJournal extends GuiScreen {
 		// LORE ICONS
 		mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
 		IIcon icon = LoreExpansion.loreScrap.getIconFromDamage(0);
-		for (LoreKey key : loreCache) {
+		for (LoreKey key : playerLore) {
 			Lore lore = LoreLoader.INSTANCE.getLore(key);
 			if (lore != null && lore.validDimension(dimension)) {
-				int drawX = (((lore.page - 1) % 4) * LORE_BOX_GAP);
-				int drawY = 0;
-				if ((lore.page - 1) > 4) {
-					drawY = (((lore.page - 1) / 4) * LORE_BOX_GAP);
-				}
+				int page = lore.page - (4 * loreScrollIndex);
 
-				drawTexturedModelRectFromIcon(left + BOX_START.left + drawX + 1, top + BOX_START.right + drawY + 1, icon, 16, 16);
+				if (page > 0 && page <= 35) {
+					int drawX = (((page - 1) % 4) * LORE_BOX_GAP);
+					int drawY = 0;
+					if ((page - 1) > 4) {
+						drawY = (((page - 1) / 4) * LORE_BOX_GAP);
+					}
+
+					drawTexturedModelRectFromIcon(left + BOX_START.left + drawX + 1, top + BOX_START.right + drawY + 1, icon, 16, 16);
+				}
 			}
 		}
 
@@ -201,11 +214,11 @@ public class GuiJournal extends GuiScreen {
 		// ARROWS - SCROLL
 		GL11.glColor4f(1, 1, 1, 1);
 		if (current != null) {
-			if (scrollIndex > 0) {
+			if (textScrollIndex > 0) {
 				ARROW_SCROLL_UP.draw(left + LEFT_SIZE.left + ARROW_SCROLL_X, top + ARROW_SCROLL_UP_Y, (int)zLevel);
 			}
 
-			if (currentLore.size() - LORE_ROW_COUNT > scrollIndex) {
+			if (currentLore.size() - LORE_ROW_COUNT > textScrollIndex) {
 				ARROW_SCROLL_DOWN.draw(left + LEFT_SIZE.left + ARROW_SCROLL_X, top + ARROW_SCROLL_DOWN_Y, (int)zLevel);
 			}
 		}
@@ -224,30 +237,34 @@ public class GuiJournal extends GuiScreen {
 		}
 
 		// ARROWS - PAGE
-		if (inBounds(left + ARROW_PAGE_BACK_POS.left, top + ARROW_PAGE_BACK_POS.right, ARROW_PAGE_SIZE.left, ARROW_PAGE_SIZE.right, x, y)) {
-			ARROW_PAGE_BACK_MOUSEOVER.draw(left + ARROW_PAGE_BACK_POS.left, top + ARROW_PAGE_BACK_POS.right, (int)zLevel);
-		} else {
-			ARROW_PAGE_BACK.draw(left + ARROW_PAGE_BACK_POS.left, top + ARROW_PAGE_BACK_POS.right, (int)zLevel);
-		}
+//		if (inBounds(left + ARROW_PAGE_BACK_POS.left, top + ARROW_PAGE_BACK_POS.right, ARROW_PAGE_SIZE.left, ARROW_PAGE_SIZE.right, x, y)) {
+//			ARROW_PAGE_BACK_MOUSEOVER.draw(left + ARROW_PAGE_BACK_POS.left, top + ARROW_PAGE_BACK_POS.right, (int)zLevel);
+//		} else {
+//			ARROW_PAGE_BACK.draw(left + ARROW_PAGE_BACK_POS.left, top + ARROW_PAGE_BACK_POS.right, (int)zLevel);
+//		}
 
-		if (inBounds(left + ARROW_PAGE_FORWARD_POS.left, top + ARROW_PAGE_FORWARD_POS.right, ARROW_PAGE_SIZE.left, ARROW_PAGE_SIZE.right, x, y)) {
-			ARROW_PAGE_FORWARD_MOUSEOVER.draw(left + ARROW_PAGE_FORWARD_POS.left, top + ARROW_PAGE_FORWARD_POS.right, (int)zLevel);
-		} else {
-			ARROW_PAGE_FORWARD.draw(left + ARROW_PAGE_FORWARD_POS.left, top + ARROW_PAGE_FORWARD_POS.right, (int)zLevel);
-		}
+//		if (inBounds(left + ARROW_PAGE_FORWARD_POS.left, top + ARROW_PAGE_FORWARD_POS.right, ARROW_PAGE_SIZE.left, ARROW_PAGE_SIZE.right, x, y)) {
+//			ARROW_PAGE_FORWARD_MOUSEOVER.draw(left + ARROW_PAGE_FORWARD_POS.left, top + ARROW_PAGE_FORWARD_POS.right, (int)zLevel);
+//		} else {
+//			ARROW_PAGE_FORWARD.draw(left + ARROW_PAGE_FORWARD_POS.left, top + ARROW_PAGE_FORWARD_POS.right, (int)zLevel);
+//		}
 
 		// LORE TOOLTIPS
-		for (LoreKey key : loreCache) {
+		for (LoreKey key : playerLore) {
 			Lore lore = LoreLoader.INSTANCE.getLore(key);
 			if (lore != null && lore.validDimension(dimension)) {
-				int drawX = (((lore.page - 1) % 4) * LORE_BOX_GAP);
-				int drawY = 0;
-				if ((lore.page - 1) > 4) {
-					drawY = (((lore.page - 1) / 4) * LORE_BOX_GAP);
-				}
+				int page = lore.page - (4 * loreScrollIndex);
 
-				if (inBounds(left + BOX_START.left + drawX, top + BOX_START.right + drawY, 16, 16, x, y)) {
-					drawHoveringText(Arrays.asList(lore.title), x, y, mc.fontRenderer);
+				if (page > 0 && page <= 35) {
+					int drawX = (((page - 1) % 4) * LORE_BOX_GAP);
+					int drawY = 0;
+					if ((page - 1) > 4) {
+						drawY = (((page - 1) / 4) * LORE_BOX_GAP);
+					}
+
+					if (inBounds(left + BOX_START.left + drawX, top + BOX_START.right + drawY, 16, 16, x, y)) {
+						drawHoveringText(Arrays.asList(lore.title), x, y, mc.fontRenderer);
+					}
 				}
 			}
 		}
@@ -259,9 +276,9 @@ public class GuiJournal extends GuiScreen {
 		// TEXT - RIGHT
 		if (current != null) {
 			drawCenteredString(current.title, left + LEFT_SIZE.left + (RIGHT_SIZE.left / 2), top + TITLE_Y, 0x000000);
-			for (int i=scrollIndex; i<Math.min(scrollIndex + LORE_ROW_COUNT, currentLore.size()); i++) {
+			for (int i= textScrollIndex; i<Math.min(textScrollIndex + LORE_ROW_COUNT, currentLore.size()); i++) {
 				String lore = currentLore.get(i);
-				drawString(lore, left + LEFT_SIZE.left + BODY_X, (top + BODY_y + ClientProxy.renderer.FONT_HEIGHT) + ClientProxy.renderer.FONT_HEIGHT * (i - scrollIndex), TEXT_SCALE, 0x000000, true);
+				drawString(lore, left + LEFT_SIZE.left + BODY_X, (top + BODY_y + ClientProxy.renderer.FONT_HEIGHT) + ClientProxy.renderer.FONT_HEIGHT * (i - textScrollIndex), TEXT_SCALE, 0x000000, true);
 			}
 		}
 	}
@@ -280,19 +297,23 @@ public class GuiJournal extends GuiScreen {
 		}
 		int dimension = dimensions[dimensionIndex];
 
-		for (LoreKey key : loreCache) {
+		for (LoreKey key : playerLore) {
 			Lore lore = LoreLoader.INSTANCE.getLore(key);
 			if (lore != null && lore.validDimension(dimension)) {
-				int drawX = (((lore.page - 1) % 4) * LORE_BOX_GAP);
-				int drawY = 0;
-				if ((lore.page - 1) > 4) {
-					drawY = (((lore.page - 1) / 4) * LORE_BOX_GAP);
-				}
+				int page = lore.page - (4 * loreScrollIndex);
 
-				if (inBounds(left + BOX_START.left + drawX, top + BOX_START.right + drawY, 16, 16, x, y)) {
-					selectedLore = new LoreKey(lore.page, dimension);
-					loadLore(selectedLore);
-					PacketNotification.notify(lore.page, dimension, PacketNotification.Server.CONFIRM_AUTOPLAY);
+				if (page > 0 && page <= 35) {
+					int drawX = (((page - 1) % 4) * LORE_BOX_GAP);
+					int drawY = 0;
+					if ((page - 1) > 4) {
+						drawY = (((page - 1) / 4) * LORE_BOX_GAP);
+					}
+
+					if (inBounds(left + BOX_START.left + drawX, top + BOX_START.right + drawY, 16, 16, x, y)) {
+						selectedLore = new LoreKey(lore.page, dimension);
+						loadLore(selectedLore);
+						PacketNotification.notify(lore.page, dimension, PacketNotification.Server.CONFIRM_AUTOPLAY);
+					}
 				}
 			}
 		}
@@ -320,11 +341,11 @@ public class GuiJournal extends GuiScreen {
 		// ARROWS - SCROLL
 		if (current != null) {
 			if (inBounds(left + LEFT_SIZE.left + ARROW_SCROLL_X, top + ARROW_SCROLL_UP_Y, 13, 16, x, y)) {
-				scroll(-1);
+				scrollText(-1);
 			}
 
 			if (inBounds(left + LEFT_SIZE.left + ARROW_SCROLL_X, top + ARROW_SCROLL_DOWN_Y, 13, 16, x, y)) {
-				scroll(1);
+				scrollText(1);
 			}
 		}
 
@@ -348,14 +369,18 @@ public class GuiJournal extends GuiScreen {
 
 			reset();
 		}
-
-		// ARROWS - PAGE
-		//TODO
 	}
 
 	public void reset() {
+		int max = 0;
+		for (Lore lore : LoreLoader.INSTANCE.getAllLore()) {
+			if (lore != null && lore.validDimension(dimensions[dimensionIndex]) && lore.page > max) {
+				max = lore.page;
+			}
+		}
+		maxPage = max;
 		selectedLore = null;
-		scrollIndex = 0;
+		textScrollIndex = 0;
 		currentLore.clear();
 		SoundHandler.INSTANCE.stop();
 	}
@@ -386,8 +411,15 @@ public class GuiJournal extends GuiScreen {
 		}
 	}
 
-	public void onWheelScrolled(int wheel) {
-		scroll(-wheel);
+	public void onWheelScrolled(int x, int y, int wheel) {
+		int left = (width - TOTAL_SIZE.left) / 2;
+		int top = (height - TOTAL_SIZE.right) / 2;
+
+		if (inBounds(left, top, LEFT_SIZE.left, LEFT_SIZE.right, x, y)) {
+			scrollLore(-wheel);
+		} else if (inBounds(left + LEFT_SIZE.left, top, RIGHT_SIZE.left, RIGHT_SIZE.right, x, y)) {
+			scrollText(-wheel);
+		}
 	}
 
 	@Override
@@ -400,26 +432,42 @@ public class GuiJournal extends GuiScreen {
 		}
 
 		if (code == Keyboard.KEY_UP) {
-			scroll(-1);
+			scrollText(-1);
 		}
 
 		if (code == Keyboard.KEY_DOWN) {
-			scroll(1);
+			scrollText(1);
 		}
 	}
 
-	public void scroll(int theta) {
+	public void scrollLore(int theta) {
 		if (theta < 0) {
-			scrollIndex -= 2;
-			if (scrollIndex < 0) {
-				scrollIndex = 0;
+			loreScrollIndex--;
+			if (loreScrollIndex < 0) {
+				loreScrollIndex = 0;
 			}
 		}
 
 		if (theta > 0) {
-			scrollIndex += 2;
-			if (scrollIndex > Math.max(0, currentLore.size() - LORE_ROW_COUNT)) {
-				scrollIndex = Math.max(0, currentLore.size() - LORE_ROW_COUNT);
+			loreScrollIndex++;
+			if (loreScrollIndex > Math.max(0, Math.ceil(maxPage / 5))) {
+				loreScrollIndex = (int)Math.max(0, Math.ceil(maxPage / 5));
+			}
+		}
+	}
+
+	public void scrollText(int theta) {
+		if (theta < 0) {
+			textScrollIndex -= 2;
+			if (textScrollIndex < 0) {
+				textScrollIndex = 0;
+			}
+		}
+
+		if (theta > 0) {
+			textScrollIndex += 2;
+			if (textScrollIndex > Math.max(0, currentLore.size() - LORE_ROW_COUNT)) {
+				textScrollIndex = Math.max(0, currentLore.size() - LORE_ROW_COUNT);
 			}
 		}
 	}
