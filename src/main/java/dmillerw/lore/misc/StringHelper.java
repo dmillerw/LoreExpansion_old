@@ -14,4 +14,12 @@ public class StringHelper {
 		}
 	}
 
+	public static String indent(int count) {
+		StringBuilder sb = new StringBuilder();
+		for (int i=0; i<count; i++) {
+			sb.append(" ");
+		}
+		return sb.toString();
+	}
+
 }

@@ -6,18 +6,23 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import dmillerw.lore.client.sound.SoundHandler;
+import dmillerw.lore.client.texture.SmallFontRenderer;
 import dmillerw.lore.core.handler.KeyHandler;
 import dmillerw.lore.lore.LoreLoader;
 import dmillerw.lore.lore.data.Lore;
 import dmillerw.lore.lore.data.LoreKey;
 import dmillerw.lore.network.PacketHandler;
 import dmillerw.lore.network.PacketNotification;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 /**
  * @author dmillerw
  */
 public class ClientProxy extends CommonProxy {
+
+	public static SmallFontRenderer renderer;
 
 	public static LoreKey pickedUpPage;
 
@@ -29,7 +34,7 @@ public class ClientProxy extends CommonProxy {
 
 	@Override
 	public void postInit(FMLPostInitializationEvent event) {
-
+		renderer = new SmallFontRenderer(Minecraft.getMinecraft().gameSettings, new ResourceLocation("minecraft:textures/font/ascii.png"), Minecraft.getMinecraft().renderEngine, false);
 	}
 
 	@Override

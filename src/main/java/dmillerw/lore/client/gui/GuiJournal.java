@@ -8,6 +8,8 @@ import dmillerw.lore.lore.LoreLoader;
 import dmillerw.lore.lore.data.Lore;
 import dmillerw.lore.lore.data.LoreKey;
 import dmillerw.lore.misc.Pair;
+import dmillerw.lore.misc.StringHelper;
+import dmillerw.lore.network.PacketNotification;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.EntityPlayer;
@@ -64,11 +66,12 @@ public class GuiJournal extends GuiScreen {
 	private static final Pair<Integer, Integer> PAUSE_POS = new Pair<Integer, Integer>(122, 204);
 	private static final Pair<Integer, Integer> STOP_POS = new Pair<Integer, Integer>(41, 204);
 
-	private static final float TEXT_SCALE = 0.651F;
+	private static final float TEXT_SCALE = 1F;
 
+	private static final int INDENTATION = 3;
 	private static final int TITLE_Y = 24;
 	private static final int BODY_X = 20;
-	private static final int BODY_y = 40;
+	private static final int BODY_y = 35;
 	private static final int LORE_BOX_GAP = 22;
 	private static final int LORE_ROW_COUNT = 17;
 	private static final int ARROW_SCROLL_X = 78;
@@ -256,13 +259,10 @@ public class GuiJournal extends GuiScreen {
 		// TEXT - RIGHT
 		if (current != null) {
 			drawCenteredString(current.title, left + LEFT_SIZE.left + (RIGHT_SIZE.left / 2), top + TITLE_Y, 0x000000);
-			boolean unicodeCache = mc.fontRenderer.getUnicodeFlag();
-			mc.fontRenderer.setUnicodeFlag(false);
 			for (int i=scrollIndex; i<Math.min(scrollIndex + LORE_ROW_COUNT, currentLore.size()); i++) {
 				String lore = currentLore.get(i);
-				drawString(lore, left + LEFT_SIZE.left + BODY_X, (top + BODY_y + fontRendererObj.FONT_HEIGHT) + fontRendererObj.FONT_HEIGHT * (i - scrollIndex), TEXT_SCALE, 0x000000);
+				drawString(lore, left + LEFT_SIZE.left + BODY_X, (top + BODY_y + ClientProxy.renderer.FONT_HEIGHT) + ClientProxy.renderer.FONT_HEIGHT * (i - scrollIndex), TEXT_SCALE, 0x000000, true);
 			}
-			mc.fontRenderer.setUnicodeFlag(unicodeCache);
 		}
 	}
 
@@ -292,6 +292,7 @@ public class GuiJournal extends GuiScreen {
 				if (inBounds(left + BOX_START.left + drawX, top + BOX_START.right + drawY, 16, 16, x, y)) {
 					selectedLore = new LoreKey(lore.page, dimension);
 					loadLore(selectedLore);
+					PacketNotification.notify(lore.page, dimension, PacketNotification.Server.CONFIRM_AUTOPLAY);
 				}
 			}
 		}
@@ -372,7 +373,7 @@ public class GuiJournal extends GuiScreen {
 			if (!str.isEmpty()) {
 				str = str.trim();
 				str = str.replace("\t", "");
-				str = "     " + str;
+				str = StringHelper.indent(INDENTATION) + str;
 				newList.add(str);
 				if (i != lore.length - 1) {
 					newList.add("");
@@ -381,7 +382,7 @@ public class GuiJournal extends GuiScreen {
 		}
 
 		for (String str : newList) {
-			currentLore.addAll(mc.fontRenderer.listFormattedStringToWidth(str, (int)(((RIGHT_SIZE.left) - 45) / TEXT_SCALE)));
+			currentLore.addAll(ClientProxy.renderer.listFormattedStringToWidth(str, (int) (((RIGHT_SIZE.left) - 45) / TEXT_SCALE)));
 		}
 	}
 
@@ -432,18 +433,22 @@ public class GuiJournal extends GuiScreen {
 		return (x <= mX) && (mX <= x + w) && (y <= mY) && (mY <= y + h);
 	}
 
-	public void drawString(String str, int x, int y, int color) {
-		drawString(str, x, y, 1.0F, color);
-	}
-
 	public void drawCenteredString(String str, int x, int y, int color) {
-		drawString(str, x - fontRendererObj.getStringWidth(str) / 2, y, color);
+		drawString(str, x - mc.fontRenderer.getStringWidth(str) / 2, y, color);
 	}
 
-	public void drawString(String str, int x, int y, float mult, int color) {
+	public void drawString(String str, int x, int y, int color) {
+		drawString(str, x, y, 1.0F, color, false);
+	}
+
+	public void drawString(String str, int x, int y, float mult, int color, boolean custom) {
 		GL11.glPushMatrix();
 		GL11.glScalef(mult, mult, 1.0F);
-		fontRendererObj.drawString(str, (int) ((x) / mult), (int) ((y) / mult), color);
+		if (custom) {
+			ClientProxy.renderer.drawString(str, (int)((x) / mult), (int)((y) / mult), color);
+		} else {
+			mc.fontRenderer.drawString(str, (int)((x) / mult), (int)((y) / mult), color);
+		}
 		GL11.glPopMatrix();
 	}
 }
