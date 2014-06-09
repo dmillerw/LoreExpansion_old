@@ -416,7 +416,7 @@ public class GuiJournal extends GuiScreen {
 		int top = (height - TOTAL_SIZE.right) / 2;
 
 		if (inBounds(left, top, LEFT_SIZE.left, LEFT_SIZE.right, x, y)) {
-			scrollLore(-wheel);
+//			scrollLore(-wheel);
 		} else if (inBounds(left + LEFT_SIZE.left, top, RIGHT_SIZE.left, RIGHT_SIZE.right, x, y)) {
 			scrollText(-wheel);
 		}
