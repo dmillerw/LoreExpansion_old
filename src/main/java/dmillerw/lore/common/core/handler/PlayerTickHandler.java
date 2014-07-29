@@ -26,9 +26,10 @@ import org.lwjgl.input.Keyboard;
  */
 public class PlayerTickHandler {
 
+    private boolean notifiedThisTick = false;
+
 	@SubscribeEvent
 	public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-		boolean notifiedThisTick = false;
 		if (event.phase == TickEvent.Phase.START && event.side == Side.SERVER) {
 			if (!event.player.capabilities.isCreativeMode) {
 				for (int i=0; i<event.player.inventory.getSizeInventory(); i++) {
@@ -64,7 +65,12 @@ public class PlayerTickHandler {
 
 							event.player.inventory.setInventorySlotContents(i, null);
 							event.player.inventory.markDirty();
+
+                            return;
 						}
+
+                        // Only set this to false if no lore has been updated this tick
+                        notifiedThisTick = false;
 					}
 				}
 			}
