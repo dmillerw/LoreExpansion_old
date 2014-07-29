@@ -44,7 +44,7 @@ public class SubTexture {
 		TextureManager manager = Minecraft.getMinecraft().getTextureManager();
 		ITextureObject textureObject = manager.getTexture(texture);
 		int bound = GL11.glGetInteger(GL11.GL_TEXTURE_BINDING_2D);
-		if (textureObject == null || bound != manager.getTexture(texture).getGlTextureId()) {
+		if (textureObject == null || bound != textureObject.getGlTextureId()) {
 			manager.bindTexture(texture);
 		}
 
