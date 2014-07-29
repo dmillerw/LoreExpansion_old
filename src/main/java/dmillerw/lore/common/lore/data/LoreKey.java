@@ -61,4 +61,8 @@ public class LoreKey {
 		result = 31 * result + dimension;
 		return result;
 	}
+
+    public LoreKey copy() {
+        return new LoreKey(this.page, this.dimension);
+    }
 }

@@ -10,6 +10,7 @@ import dmillerw.lore.common.lore.LoreLoader;
 import dmillerw.lore.common.lore.PlayerHandler;
 import dmillerw.lore.common.lore.data.Lore;
 import dmillerw.lore.common.lore.data.LoreKey;
+import dmillerw.lore.common.lore.data.entity.LoreProperties;
 import dmillerw.lore.common.network.packet.PacketClientNotification;
 import dmillerw.lore.common.network.packet.PacketHandler;
 import dmillerw.lore.common.network.packet.PacketSyncLore;
@@ -50,7 +51,16 @@ public class PlayerTickHandler {
 
 							PacketSyncLore.updateLore((EntityPlayerMP) event.player);
 
+                            // Pickup notification packet
 							PacketHandler.INSTANCE.sendTo(new PacketClientNotification(key.page, key.dimension, PacketClientNotification.PICKUP), (EntityPlayerMP) event.player);
+
+                            // Autoplay handling
+                            LoreProperties properties = PlayerHandler.getCollectedLore(event.player);
+
+                            if (lore.autoplay && properties.canAutoplay(key)) {
+                                properties.setAutoplayed(key, true);
+                                PacketHandler.INSTANCE.sendTo(new PacketClientNotification(key.page, key.dimension, PacketClientNotification.AUTOPLAY), (EntityPlayerMP) event.player);
+                            }
 
 							CommandHandler ch = (CommandHandler) MinecraftServer.getServer().getCommandManager();
 							LoreCommandSender commandSender = new LoreCommandSender(event.player);
@@ -60,7 +70,7 @@ public class PlayerTickHandler {
 
 							if (lore.notify && !notifiedThisTick) {
 								event.player.addChatComponentMessage(new ChatComponentText("You've discovered a new lore page. Press " + Keyboard.getKeyName(KeyHandler.INSTANCE.key.getKeyCode()) + " to view"));
-								notifiedThisTick = true;
+//								notifiedThisTick = true;
 							}
 
 							event.player.inventory.setInventorySlotContents(i, null);

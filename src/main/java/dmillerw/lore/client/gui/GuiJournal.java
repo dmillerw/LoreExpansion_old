@@ -108,7 +108,9 @@ public class GuiJournal extends GuiScreen {
 			dimensionIndex = 0;
 		}
 
-		reset();
+        // Why was I resetting...? :/
+        //TODO Analyze
+//		reset();
 
 		// Open selected page
 		if (selectedLore != null) {
