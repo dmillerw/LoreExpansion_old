@@ -9,16 +9,15 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
-import dmillerw.lore.command.CommandLore;
-import dmillerw.lore.core.GuiHandler;
-import dmillerw.lore.core.handler.DefaultFileHandler;
-import dmillerw.lore.core.handler.PlayerTickHandler;
-import dmillerw.lore.core.proxy.CommonProxy;
-import dmillerw.lore.item.ItemJournal;
-import dmillerw.lore.item.ItemLorePage;
-import dmillerw.lore.lore.LoreLoader;
-import dmillerw.lore.network.NetworkEventHandler;
-import dmillerw.lore.network.PacketHandler;
+import dmillerw.lore.common.command.CommandLore;
+import dmillerw.lore.common.core.GuiHandler;
+import dmillerw.lore.common.core.handler.DefaultFileHandler;
+import dmillerw.lore.common.core.handler.PlayerTickHandler;
+import dmillerw.lore.common.item.ItemJournal;
+import dmillerw.lore.common.item.ItemLorePage;
+import dmillerw.lore.common.lore.LoreLoader;
+import dmillerw.lore.common.network.NetworkEventHandler;
+import dmillerw.lore.common.network.packet.PacketHandler;
 import net.minecraft.item.Item;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,7 +27,7 @@ import java.io.File;
 /**
  * @author dmillerw
  */
-@Mod(modid = "LoreExp", name = "Lore Expansion", version = "1.0.0", dependencies = "required-after:Forge@[10.12.1.1112,)")
+@Mod(modid = "LoreExp", name = "Lore Expansion", version = "%MOD_VERSION%", dependencies = "required-after:Forge@[%FORGE_VERSION%,)")
 public class LoreExpansion {
 
 	private static final String CONFIG_FOLDER = "LoreExpansion";
@@ -40,20 +39,20 @@ public class LoreExpansion {
 	@Mod.Instance("LoreExp")
 	public static LoreExpansion instance;
 
-	@SidedProxy(serverSide = "dmillerw.lore.core.proxy.CommonProxy", clientSide = "dmillerw.lore.core.proxy.ClientProxy")
+	@SidedProxy(serverSide = "dmillerw.lore.CommonProxy", clientSide = "dmillerw.lore.ClientProxy")
 	public static CommonProxy proxy;
 
 	public static File configFolder;
 	public static File loreFolder;
 	public static File audioFolder;
 
-	public static Item loreScrap;
+	public static Item lorePage;
 	public static Item journal;
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		loreScrap = new ItemLorePage().setUnlocalizedName("page");
-		GameRegistry.registerItem(loreScrap, "page");
+		lorePage = new ItemLorePage().setUnlocalizedName("page");
+		GameRegistry.registerItem(lorePage, "page");
 
 		journal = new ItemJournal().setUnlocalizedName("journal");
 		GameRegistry.registerItem(journal, "journal");

@@ -3,13 +3,12 @@ package dmillerw.lore.client.gui;
 import dmillerw.lore.LoreExpansion;
 import dmillerw.lore.client.sound.SoundHandler;
 import dmillerw.lore.client.texture.SubTexture;
-import dmillerw.lore.core.proxy.ClientProxy;
-import dmillerw.lore.lore.LoreLoader;
-import dmillerw.lore.lore.data.Lore;
-import dmillerw.lore.lore.data.LoreKey;
-import dmillerw.lore.misc.Pair;
-import dmillerw.lore.misc.StringHelper;
-import dmillerw.lore.network.PacketNotification;
+import dmillerw.lore.ClientProxy;
+import dmillerw.lore.common.lore.LoreLoader;
+import dmillerw.lore.common.lore.data.Lore;
+import dmillerw.lore.common.lore.data.LoreKey;
+import dmillerw.lore.common.misc.Pair;
+import dmillerw.lore.common.misc.StringHelper;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.EntityPlayer;
@@ -82,7 +81,7 @@ public class GuiJournal extends GuiScreen {
 
 	public static int loreScrollIndex = 0;
 	public static int textScrollIndex = 0;
-	public static List<LoreKey> playerLore;
+	public static List<LoreKey> playerLore = new ArrayList<LoreKey>();
 	public static LoreKey selectedLore;
 
 	private static int[] dimensions = new int[] {Integer.MAX_VALUE};
@@ -174,7 +173,7 @@ public class GuiJournal extends GuiScreen {
 
 		// LORE ICONS
 		mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
-		IIcon icon = LoreExpansion.loreScrap.getIconFromDamage(0);
+		IIcon icon = LoreExpansion.lorePage.getIconFromDamage(0);
 		for (LoreKey key : playerLore) {
 			Lore lore = LoreLoader.INSTANCE.getLore(key);
 			if (lore != null && lore.validDimension(dimension)) {
@@ -312,7 +311,6 @@ public class GuiJournal extends GuiScreen {
 					if (inBounds(left + BOX_START.left + drawX, top + BOX_START.right + drawY, 16, 16, x, y)) {
 						selectedLore = new LoreKey(lore.page, dimension);
 						loadLore(selectedLore);
-						PacketNotification.notify(lore.page, dimension, PacketNotification.Server.CONFIRM_AUTOPLAY);
 					}
 				}
 			}
@@ -351,23 +349,29 @@ public class GuiJournal extends GuiScreen {
 
 		// ARROWS - DIMENSION
 		if (inBounds(left + TAB_BACK.left, top + TAB_BACK.right, TAB_SIZE.left, TAB_SIZE.right, x, y)) {
+			int lastIndex = dimensionIndex;
 			if (dimensionIndex <= 0) {
 				dimensionIndex = dimensions.length - 1;
 			} else {
 				dimensionIndex--;
 			}
 
-			reset();
+			if (lastIndex != dimensionIndex) {
+				reset();
+			}
 		}
 
 		if (inBounds(left + TAB_FORWARD.left, top + TAB_FORWARD.right, TAB_SIZE.left, TAB_SIZE.right, x, y)) {
+			int lastIndex = dimensionIndex;
 			if (dimensionIndex >= dimensions.length - 1) {
 				dimensionIndex = 0;
 			} else {
 				dimensionIndex++;
 			}
 
-			reset();
+			if (lastIndex != dimensionIndex) {
+				reset();
+			}
 		}
 	}
 
