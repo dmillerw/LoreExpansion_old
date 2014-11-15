@@ -7,8 +7,7 @@ import dmillerw.lore.common.lore.data.LoreKey;
  */
 public interface INotificationPacket {
 
-	public byte getType();
+    public byte getType();
 
-	public LoreKey getData();
-
+    public LoreKey getData();
 }

@@ -14,28 +14,28 @@ import java.util.Map;
  */
 public class TagDeserializer implements JsonDeserializer<LoreTags> {
 
-	@Override
-	public LoreTags deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-		LoreTags tag = new LoreTags();
+    @Override
+    public LoreTags deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        LoreTags tag = new LoreTags();
 
-		for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject().entrySet()) {
-			String key = entry.getKey();
-			JsonElement element = entry.getValue();
+        for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject().entrySet()) {
+            String key = entry.getKey();
+            JsonElement element = entry.getValue();
 
-			if (key.equalsIgnoreCase("default")) {
-				tag.defaultTag = element.getAsString();
-			} else {
-				try {
-					int dimension = Integer.parseInt(key);
-					tag.mapping.put(dimension, element.getAsString());
-				} catch (NumberFormatException ex) {
-					if (key.equalsIgnoreCase("global")) {
-						tag.mapping.put(Integer.MAX_VALUE, element.getAsString());
-					}
-				}
-			}
-		}
+            if (key.equalsIgnoreCase("default")) {
+                tag.defaultTag = element.getAsString();
+            } else {
+                try {
+                    int dimension = Integer.parseInt(key);
+                    tag.mapping.put(dimension, element.getAsString());
+                } catch (NumberFormatException ex) {
+                    if (key.equalsIgnoreCase("global")) {
+                        tag.mapping.put(Integer.MAX_VALUE, element.getAsString());
+                    }
+                }
+            }
+        }
 
-		return tag;
-	}
+        return tag;
+    }
 }

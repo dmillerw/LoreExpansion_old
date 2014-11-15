@@ -7,9 +7,8 @@ import java.io.File;
  */
 public class FileHelper {
 
-	public static boolean isJSONFile(File file) {
-		String name = file.getName();
-		return (name.substring(name.lastIndexOf(".") + 1, name.length()).equalsIgnoreCase("json"));
-	}
-
+    public static boolean isJSONFile(File file) {
+        String name = file.getName();
+        return (name.substring(name.lastIndexOf(".") + 1, name.length()).equalsIgnoreCase("json"));
+    }
 }

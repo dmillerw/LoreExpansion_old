@@ -10,10 +10,10 @@ import java.lang.reflect.Type;
  */
 public class TagSerializer implements JsonSerializer<LoreTags> {
 
-	@Override
-	public JsonElement serialize(LoreTags src, Type typeOfSrc, JsonSerializationContext context) {
-		JsonObject jsonObject = new JsonObject();
-		jsonObject.add("default", new JsonPrimitive(src.defaultTag));
-		return jsonObject;
-	}
+    @Override
+    public JsonElement serialize(LoreTags src, Type typeOfSrc, JsonSerializationContext context) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.add("default", new JsonPrimitive(src.defaultTag));
+        return jsonObject;
+    }
 }

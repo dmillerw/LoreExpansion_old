@@ -21,65 +21,64 @@ import java.util.List;
  */
 public class PacketSyncLore implements IMessage, IMessageHandler<PacketSyncLore, IMessage> {
 
-	public static void updateLore(EntityPlayerMP player) {
-		PacketHandler.INSTANCE.sendTo(new PacketSyncLore(player), player);
-	}
+    public static void updateLore(EntityPlayerMP player) {
+        PacketHandler.INSTANCE.sendTo(new PacketSyncLore(player), player);
+    }
 
-	private List<LoreKey> lore;
+    private List<LoreKey> lore;
 
-	public PacketSyncLore() {
+    public PacketSyncLore() {
 
-	}
+    }
 
-	public PacketSyncLore(EntityPlayer player) {
-		this.lore = PlayerHandler.getCollectedLore(player).getLore();
-	}
+    public PacketSyncLore(EntityPlayer player) {
+        this.lore = PlayerHandler.getCollectedLore(player).getLore();
+    }
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		buf.writeInt(lore.size());
-		if (!lore.isEmpty()) {
-			for (int i=0; i<lore.size(); i++) {
-				LoreKey key = lore.get(i);
+    @Override
+    public void toBytes(ByteBuf buf) {
+        buf.writeInt(lore.size());
+        if (!lore.isEmpty()) {
+            for (int i = 0; i < lore.size(); i++) {
+                LoreKey key = lore.get(i);
 
-				buf.writeInt(key.page);
-				if (key.dimension == Integer.MAX_VALUE) {
-					buf.writeBoolean(false);
-				} else {
-					buf.writeBoolean(true);
-					buf.writeInt(key.dimension);
-				}
-			}
-		}
-	}
+                buf.writeInt(key.page);
+                if (key.dimension == Integer.MAX_VALUE) {
+                    buf.writeBoolean(false);
+                } else {
+                    buf.writeBoolean(true);
+                    buf.writeInt(key.dimension);
+                }
+            }
+        }
+    }
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		lore = new ArrayList<LoreKey>();
-		int size = buf.readInt();
-		for (int i=0; i<size; i++) {
-			int page = buf.readInt();
-			int dimension = Integer.MAX_VALUE;
-			if (buf.readBoolean()) {
-				dimension = buf.readInt();
-			}
-			lore.add(new LoreKey(page, dimension));
-		}
-	}
+    @Override
+    public void fromBytes(ByteBuf buf) {
+        lore = new ArrayList<LoreKey>();
+        int size = buf.readInt();
+        for (int i = 0; i < size; i++) {
+            int page = buf.readInt();
+            int dimension = Integer.MAX_VALUE;
+            if (buf.readBoolean()) {
+                dimension = buf.readInt();
+            }
+            lore.add(new LoreKey(page, dimension));
+        }
+    }
 
-	@Override
-	public IMessage onMessage(PacketSyncLore message, MessageContext ctx) {
-		World world = LoreExpansion.proxy.getClientWorld();
-		if (world == null) {
-			return null;
-		}
-		GuiJournal.playerLore.clear();
-		GuiJournal.playerLore = message.lore;
-		if (!GuiJournal.playerLore.contains(GuiJournal.selectedLore)) {
-			GuiJournal.selectedLore = null;
-			SoundHandler.INSTANCE.stop(); // Just in case
-		}
-		return null;
-	}
-
+    @Override
+    public IMessage onMessage(PacketSyncLore message, MessageContext ctx) {
+        World world = LoreExpansion.proxy.getClientWorld();
+        if (world == null) {
+            return null;
+        }
+        GuiJournal.playerLore.clear();
+        GuiJournal.playerLore = message.lore;
+        if (!GuiJournal.playerLore.contains(GuiJournal.selectedLore)) {
+            GuiJournal.selectedLore = null;
+            SoundHandler.INSTANCE.stop(); // Just in case
+        }
+        return null;
+    }
 }

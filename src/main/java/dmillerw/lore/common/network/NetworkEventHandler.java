@@ -12,12 +12,12 @@ import net.minecraft.entity.player.EntityPlayer;
  */
 public class NetworkEventHandler {
 
-	@SubscribeEvent
-	public void playerLoggedInEvent(PlayerEvent.PlayerLoggedInEvent event) {
-		EntityPlayer player = event.player;
-		Side side = FMLCommonHandler.instance().getEffectiveSide();
-		if (side == Side.SERVER) {
-			PlayerHandler.attach(player);
-		}
-	}
+    @SubscribeEvent
+    public void playerLoggedInEvent(PlayerEvent.PlayerLoggedInEvent event) {
+        EntityPlayer player = event.player;
+        Side side = FMLCommonHandler.instance().getEffectiveSide();
+        if (side == Side.SERVER) {
+            PlayerHandler.attach(player);
+        }
+    }
 }

@@ -30,69 +30,69 @@ import java.io.File;
 @Mod(modid = "LoreExp", name = "Lore Expansion", version = "%MOD_VERSION%", dependencies = "required-after:Forge@[%FORGE_VERSION%,)")
 public class LoreExpansion {
 
-	private static final String CONFIG_FOLDER = "LoreExpansion";
-	private static final String LORE_FOLDER = "lore";
-	private static final String AUDIO_FOLDER = "audio";
+    private static final String CONFIG_FOLDER = "LoreExpansion";
+    private static final String LORE_FOLDER = "lore";
+    private static final String AUDIO_FOLDER = "audio";
 
-	public static final Logger logger = LogManager.getLogger("Lore Expansion");
+    public static final Logger logger = LogManager.getLogger("Lore Expansion");
 
-	@Mod.Instance("LoreExp")
-	public static LoreExpansion instance;
+    @Mod.Instance("LoreExp")
+    public static LoreExpansion instance;
 
-	@SidedProxy(serverSide = "dmillerw.lore.CommonProxy", clientSide = "dmillerw.lore.ClientProxy")
-	public static CommonProxy proxy;
+    @SidedProxy(serverSide = "dmillerw.lore.CommonProxy", clientSide = "dmillerw.lore.ClientProxy")
+    public static CommonProxy proxy;
 
-	public static File configFolder;
-	public static File loreFolder;
-	public static File audioFolder;
+    public static File configFolder;
+    public static File loreFolder;
+    public static File audioFolder;
 
-	public static Item lorePage;
-	public static Item journal;
+    public static Item lorePage;
+    public static Item journal;
 
-	@Mod.EventHandler
-	public void preInit(FMLPreInitializationEvent event) {
-		lorePage = new ItemLorePage().setUnlocalizedName("page");
-		GameRegistry.registerItem(lorePage, "page");
+    @Mod.EventHandler
+    public void preInit(FMLPreInitializationEvent event) {
+        lorePage = new ItemLorePage().setUnlocalizedName("page");
+        GameRegistry.registerItem(lorePage, "page");
 
-		journal = new ItemJournal().setUnlocalizedName("journal");
-		GameRegistry.registerItem(journal, "journal");
+        journal = new ItemJournal().setUnlocalizedName("journal");
+        GameRegistry.registerItem(journal, "journal");
 
-		configFolder = new File(event.getModConfigurationDirectory(), CONFIG_FOLDER);
-		loreFolder = new File(configFolder, LORE_FOLDER);
-		audioFolder = new File(loreFolder, AUDIO_FOLDER);
-		if (!configFolder.exists()) {
-			configFolder.mkdir();
-		}
-		if (!loreFolder.exists()) {
-			loreFolder.mkdir();
-		}
-		if (!audioFolder.exists()) {
-			audioFolder.mkdir();
-		}
+        configFolder = new File(event.getModConfigurationDirectory(), CONFIG_FOLDER);
+        loreFolder = new File(configFolder, LORE_FOLDER);
+        audioFolder = new File(loreFolder, AUDIO_FOLDER);
+        if (!configFolder.exists()) {
+            configFolder.mkdir();
+        }
+        if (!loreFolder.exists()) {
+            loreFolder.mkdir();
+        }
+        if (!audioFolder.exists()) {
+            audioFolder.mkdir();
+        }
 
-		DefaultFileHandler.initialize();
-		LoreLoader.initialize();
+        DefaultFileHandler.initialize();
+        LoreLoader.initialize();
 
-		PacketHandler.init();
+        PacketHandler.init();
 
-		FMLCommonHandler.instance().bus().register(new NetworkEventHandler());
-		FMLCommonHandler.instance().bus().register(new PlayerTickHandler());
+        FMLCommonHandler.instance().bus().register(new NetworkEventHandler());
+        FMLCommonHandler.instance().bus().register(new PlayerTickHandler());
 
-		proxy.preInit(event);
-	}
+        proxy.preInit(event);
+    }
 
-	@Mod.EventHandler
-	public void init(FMLInitializationEvent event) {
-		NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
-	}
+    @Mod.EventHandler
+    public void init(FMLInitializationEvent event) {
+        NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
+    }
 
-	@Mod.EventHandler
-	public void postInit(FMLPostInitializationEvent event) {
-		proxy.postInit(event);
-	}
+    @Mod.EventHandler
+    public void postInit(FMLPostInitializationEvent event) {
+        proxy.postInit(event);
+    }
 
-	@Mod.EventHandler
-	public void onServerStarting(FMLServerStartingEvent event) {
-		event.registerServerCommand(new CommandLore());
-	}
+    @Mod.EventHandler
+    public void onServerStarting(FMLServerStartingEvent event) {
+        event.registerServerCommand(new CommandLore());
+    }
 }

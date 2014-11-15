@@ -21,56 +21,56 @@ import java.util.Map;
  */
 public class CommandLore extends CommandBase {
 
-	private static Map<String, Long> confirmationMap = Maps.newHashMap();
+    private static Map<String, Long> confirmationMap = Maps.newHashMap();
 
-	@Override
-	public String getCommandName() {
-		return "lore";
-	}
+    @Override
+    public String getCommandName() {
+        return "lore";
+    }
 
-	@Override
-	public String getCommandUsage(ICommandSender sender) {
-		return "/lore <reload/clear>";
-	}
+    @Override
+    public String getCommandUsage(ICommandSender sender) {
+        return "/lore <reload/clear>";
+    }
 
-	@Override
-	public List addTabCompletionOptions(ICommandSender sender, String[] array) {
-		if (array.length != 0 && (array[0].equalsIgnoreCase("clear") || array[0].equalsIgnoreCase("reload"))) {
-			return super.addTabCompletionOptions(sender, array);
-		} else {
-			return Arrays.asList("reload", "clear");
-		}
-	}
+    @Override
+    public List addTabCompletionOptions(ICommandSender sender, String[] array) {
+        if (array.length != 0 && (array[0].equalsIgnoreCase("clear") || array[0].equalsIgnoreCase("reload"))) {
+            return super.addTabCompletionOptions(sender, array);
+        } else {
+            return Arrays.asList("reload", "clear");
+        }
+    }
 
-	@Override
-	public void processCommand(ICommandSender sender, String[] args) {
-		if (args.length != 1) {
-			throw new WrongUsageException(getCommandUsage(sender));
-		}
+    @Override
+    public void processCommand(ICommandSender sender, String[] args) {
+        if (args.length != 1) {
+            throw new WrongUsageException(getCommandUsage(sender));
+        }
 
-		if (args[0].equalsIgnoreCase("reload")) {
-			LoreLoader.INSTANCE.clear();
-			LoreLoader.initialize();
-			sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Reloaded Lore"));
-		} else if (args[0].equalsIgnoreCase("clear")) {
-			if (sender instanceof EntityPlayer) {
-				EntityPlayer player = (EntityPlayer) sender;
+        if (args[0].equalsIgnoreCase("reload")) {
+            LoreLoader.INSTANCE.clear();
+            LoreLoader.initialize();
+            sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Reloaded Lore"));
+        } else if (args[0].equalsIgnoreCase("clear")) {
+            if (sender instanceof EntityPlayer) {
+                EntityPlayer player = (EntityPlayer) sender;
 
-				long time = System.nanoTime();
-				if ((time - safeGet(player.getCommandSenderName())) > 5000000000L) {
-					player.addChatComponentMessage(new ChatComponentText("WARNING: This will erase ALL your collected lore. Run the command again to confirm"));
-					confirmationMap.put(player.getCommandSenderName(), time);
-				} else {
-					PlayerHandler.getCollectedLore(player).clear();
-					PacketSyncLore.updateLore((EntityPlayerMP) player);
-					player.addChatComponentMessage(new ChatComponentText("Cleared Lore"));
-					confirmationMap.remove(player.getCommandSenderName());
-				}
-			}
-		}
-	}
+                long time = System.nanoTime();
+                if ((time - safeGet(player.getCommandSenderName())) > 5000000000L) {
+                    player.addChatComponentMessage(new ChatComponentText("WARNING: This will erase ALL your collected lore. Run the command again to confirm"));
+                    confirmationMap.put(player.getCommandSenderName(), time);
+                } else {
+                    PlayerHandler.getCollectedLore(player).clear();
+                    PacketSyncLore.updateLore((EntityPlayerMP) player);
+                    player.addChatComponentMessage(new ChatComponentText("Cleared Lore"));
+                    confirmationMap.remove(player.getCommandSenderName());
+                }
+            }
+        }
+    }
 
-	private long safeGet(String key) {
-		return confirmationMap.containsKey(key) ? confirmationMap.get(key) : 0L;
-	}
+    private long safeGet(String key) {
+        return confirmationMap.containsKey(key) ? confirmationMap.get(key) : 0L;
+    }
 }

@@ -18,28 +18,27 @@ import org.lwjgl.input.Keyboard;
  */
 public class KeyHandler {
 
-	public static final KeyHandler INSTANCE = new KeyHandler();
+    public static final KeyHandler INSTANCE = new KeyHandler();
 
-	public KeyBinding key = new KeyBinding("Lore Journal", Keyboard.KEY_L, "key.categories.misc");
+    public KeyBinding key = new KeyBinding("Lore Journal", Keyboard.KEY_L, "key.categories.misc");
 
-	public KeyHandler() {
-		ClientRegistry.registerKeyBinding(key);
-	}
+    public KeyHandler() {
+        ClientRegistry.registerKeyBinding(key);
+    }
 
-	@SideOnly(Side.CLIENT)
-	@SubscribeEvent
-	public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-		if (event.side == Side.SERVER) {
-			return;
-		}
-		if (event.phase == TickEvent.Phase.START) {
-			if (key.getIsKeyPressed() && FMLClientHandler.instance().getClient().inGameHasFocus) {
-				if (ClientProxy.pickedUpPage != null) {
-					GuiJournal.selectedLore = ClientProxy.pickedUpPage;
-				}
-				event.player.openGui(LoreExpansion.instance, GuiHandler.GUI_JOURNAL, event.player.worldObj, 0, 0, 0);
-			}
-		}
-	}
-
+    @SideOnly(Side.CLIENT)
+    @SubscribeEvent
+    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        if (event.side == Side.SERVER) {
+            return;
+        }
+        if (event.phase == TickEvent.Phase.START) {
+            if (key.getIsKeyPressed() && FMLClientHandler.instance().getClient().inGameHasFocus) {
+                if (ClientProxy.pickedUpPage != null) {
+                    GuiJournal.selectedLore = ClientProxy.pickedUpPage;
+                }
+                event.player.openGui(LoreExpansion.instance, GuiHandler.GUI_JOURNAL, event.player.worldObj, 0, 0, 0);
+            }
+        }
+    }
 }

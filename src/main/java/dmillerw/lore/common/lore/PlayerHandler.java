@@ -8,14 +8,13 @@ import net.minecraft.entity.player.EntityPlayer;
  */
 public class PlayerHandler {
 
-	public static final String LORE_PROPERTIES = "loreexp:collected_lore";
+    public static final String LORE_PROPERTIES = "loreexp:collected_lore";
 
-	public static void attach(EntityPlayer player) {
-		player.registerExtendedProperties(LORE_PROPERTIES, new LoreProperties());
-	}
+    public static void attach(EntityPlayer player) {
+        player.registerExtendedProperties(LORE_PROPERTIES, new LoreProperties());
+    }
 
-	public static LoreProperties getCollectedLore(EntityPlayer player) {
-		return (LoreProperties) player.getExtendedProperties(LORE_PROPERTIES);
-	}
-
+    public static LoreProperties getCollectedLore(EntityPlayer player) {
+        return (LoreProperties) player.getExtendedProperties(LORE_PROPERTIES);
+    }
 }

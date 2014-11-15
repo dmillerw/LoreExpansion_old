@@ -10,25 +10,25 @@ import net.minecraft.world.World;
  */
 public class GuiHandler implements IGuiHandler {
 
-	public static final int GUI_JOURNAL = 0;
+    public static final int GUI_JOURNAL = 0;
 
-	@Override
-	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		switch (ID) {
-			case GUI_JOURNAL:
+    @Override
+    public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+        switch (ID) {
+            case GUI_JOURNAL:
                 // May not be necessary (was causing problems with autoplaying)
 //				PacketSyncLore.updateLore((EntityPlayerMP) player);
-				return null;
-		}
-		return null;
-	}
+                return null;
+        }
+        return null;
+    }
 
-	@Override
-	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		switch (ID) {
-			case GUI_JOURNAL: return new GuiJournal(player);
-		}
-		return null;
-	}
-
+    @Override
+    public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+        switch (ID) {
+            case GUI_JOURNAL:
+                return new GuiJournal(player);
+        }
+        return null;
+    }
 }

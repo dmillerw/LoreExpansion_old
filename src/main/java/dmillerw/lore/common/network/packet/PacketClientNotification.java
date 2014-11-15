@@ -13,64 +13,63 @@ import net.minecraft.world.World;
  */
 public class PacketClientNotification implements INotificationPacket, IMessage, IMessageHandler<PacketClientNotification, IMessage> {
 
-	public static final byte PICKUP = 0;
-	public static final byte AUTOPLAY = 1;
+    public static final byte PICKUP = 0;
+    public static final byte AUTOPLAY = 1;
 
-	public int page;
-	public int dimension;
+    public int page;
+    public int dimension;
 
-	public byte type;
+    public byte type;
 
-	public PacketClientNotification() {
+    public PacketClientNotification() {
 
-	}
+    }
 
-	public PacketClientNotification(int page, int dimension, byte type) {
-		this.page = page;
-		this.dimension = dimension;
-		this.type = type;
-	}
+    public PacketClientNotification(int page, int dimension, byte type) {
+        this.page = page;
+        this.dimension = dimension;
+        this.type = type;
+    }
 
-	@Override
-	public byte getType() {
-		return type;
-	}
+    @Override
+    public byte getType() {
+        return type;
+    }
 
-	@Override
-	public LoreKey getData() {
-		return new LoreKey(page, dimension);
-	}
+    @Override
+    public LoreKey getData() {
+        return new LoreKey(page, dimension);
+    }
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-		buf.writeInt(page);
-		if (dimension == Integer.MAX_VALUE) {
-			buf.writeBoolean(false);
-		} else {
-			buf.writeBoolean(true);
-			buf.writeInt(dimension);
-		}
-		buf.writeByte(type);
-	}
+    @Override
+    public void toBytes(ByteBuf buf) {
+        buf.writeInt(page);
+        if (dimension == Integer.MAX_VALUE) {
+            buf.writeBoolean(false);
+        } else {
+            buf.writeBoolean(true);
+            buf.writeInt(dimension);
+        }
+        buf.writeByte(type);
+    }
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-		page = buf.readInt();
-		dimension = Integer.MAX_VALUE;
-		if (buf.readBoolean()) {
-			dimension = buf.readInt();
-		}
-		type = buf.readByte();
-	}
+    @Override
+    public void fromBytes(ByteBuf buf) {
+        page = buf.readInt();
+        dimension = Integer.MAX_VALUE;
+        if (buf.readBoolean()) {
+            dimension = buf.readInt();
+        }
+        type = buf.readByte();
+    }
 
-	@Override
-	public IMessage onMessage(PacketClientNotification message, MessageContext ctx) {
-		World world = LoreExpansion.proxy.getClientWorld();
-		if (world == null) {
-			return null;
-		}
-		LoreExpansion.proxy.handleNotificationPacket(message, ctx);
-		return null;
-	}
-
+    @Override
+    public IMessage onMessage(PacketClientNotification message, MessageContext ctx) {
+        World world = LoreExpansion.proxy.getClientWorld();
+        if (world == null) {
+            return null;
+        }
+        LoreExpansion.proxy.handleNotificationPacket(message, ctx);
+        return null;
+    }
 }

@@ -9,14 +9,14 @@ import net.minecraft.item.Item;
  */
 public class TabLore extends CreativeTabs {
 
-	public static final CreativeTabs TAB = new TabLore();
+    public static final CreativeTabs TAB = new TabLore();
 
-	public TabLore() {
-		super("loreexp");
-	}
+    public TabLore() {
+        super("loreexp");
+    }
 
-	@Override
-	public Item getTabIconItem() {
-		return LoreExpansion.journal;
-	}
+    @Override
+    public Item getTabIconItem() {
+        return LoreExpansion.journal;
+    }
 }

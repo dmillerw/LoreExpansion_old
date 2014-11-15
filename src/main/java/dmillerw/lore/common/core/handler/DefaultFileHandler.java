@@ -13,32 +13,31 @@ import java.net.URL;
  */
 public class DefaultFileHandler {
 
-	public static final String[] FILES = new String[] {
-		"lore/tutorial.json",
-		"lore/audio/tutorial.ogg"
-	};
+    public static final String[] FILES = new String[]{
+            "lore/tutorial.json",
+            "lore/audio/tutorial.ogg"
+    };
 
-	public static void initialize() {
-		int fileCount = 0;
-		for (File file : LoreExpansion.loreFolder.listFiles()) {
-			if (FileHelper.isJSONFile(file)) fileCount++;
-		}
+    public static void initialize() {
+        int fileCount = 0;
+        for (File file : LoreExpansion.loreFolder.listFiles()) {
+            if (FileHelper.isJSONFile(file)) fileCount++;
+        }
 
-		// User hasn't added files, and we haven't copied before, so copy
-		if (fileCount == 0) {
-			for (String str : FILES) {
-				URL input = LoreExpansion.class.getResource("/assets/loreexp/defaults/" + str);
-				File output = new File(LoreExpansion.configFolder, str);
+        // User hasn't added files, and we haven't copied before, so copy
+        if (fileCount == 0) {
+            for (String str : FILES) {
+                URL input = LoreExpansion.class.getResource("/assets/loreexp/defaults/" + str);
+                File output = new File(LoreExpansion.configFolder, str);
 
-				if (input != null) {
-					try {
-						FileUtils.copyURLToFile(input, output);
-					} catch (IOException ex) {
-						LoreExpansion.logger.warn("Failed to copy " + str + " to " + output.getAbsoluteFile());
-					}
-				}
-			}
-		}
-	}
-
+                if (input != null) {
+                    try {
+                        FileUtils.copyURLToFile(input, output);
+                    } catch (IOException ex) {
+                        LoreExpansion.logger.warn("Failed to copy " + str + " to " + output.getAbsoluteFile());
+                    }
+                }
+            }
+        }
+    }
 }

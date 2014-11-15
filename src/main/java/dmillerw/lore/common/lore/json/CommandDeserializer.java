@@ -15,20 +15,20 @@ import java.util.Map;
  */
 public class CommandDeserializer implements JsonDeserializer<Lore.CommandWrapper> {
 
-	@Override
-	public Lore.CommandWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-		Lore.CommandWrapper wrapper = new Lore.CommandWrapper();
+    @Override
+    public Lore.CommandWrapper deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        Lore.CommandWrapper wrapper = new Lore.CommandWrapper();
 
-		for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject().entrySet()) {
-			String key = entry.getKey();
-			JsonElement element = entry.getValue();
+        for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject().entrySet()) {
+            String key = entry.getKey();
+            JsonElement element = entry.getValue();
 
-			if (key.equalsIgnoreCase("pickup")) {
-				wrapper.pickup = context.deserialize(element, new TypeToken<String[]>(){}.getType());
-			}
-		}
+            if (key.equalsIgnoreCase("pickup")) {
+                wrapper.pickup = context.deserialize(element, new TypeToken<String[]>() {
+                }.getType());
+            }
+        }
 
-		return wrapper;
-	}
-
+        return wrapper;
+    }
 }

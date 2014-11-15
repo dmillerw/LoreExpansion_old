@@ -21,31 +21,30 @@ import net.minecraft.world.World;
  */
 public class CommonProxy {
 
-	public void preInit(FMLPreInitializationEvent event) {
+    public void preInit(FMLPreInitializationEvent event) {
 
-	}
+    }
 
-	public void postInit(FMLPostInitializationEvent event) {
+    public void postInit(FMLPostInitializationEvent event) {
 
-	}
+    }
 
-	public void handleNotificationPacket(INotificationPacket packet, MessageContext context) {
-		if (packet.getType() == PacketServerNotification.CONFIRM_AUTOPLAY) {
-			EntityPlayer player = context.getServerHandler().playerEntity;
-			LoreKey key = packet.getData();
-			Lore lore = LoreLoader.INSTANCE.getLore(key);
+    public void handleNotificationPacket(INotificationPacket packet, MessageContext context) {
+        if (packet.getType() == PacketServerNotification.CONFIRM_AUTOPLAY) {
+            EntityPlayer player = context.getServerHandler().playerEntity;
+            LoreKey key = packet.getData();
+            Lore lore = LoreLoader.INSTANCE.getLore(key);
 
-			LoreProperties properties = PlayerHandler.getCollectedLore(player);
+            LoreProperties properties = PlayerHandler.getCollectedLore(player);
 
-			if (lore.autoplay && properties.canAutoplay(key)) {
-				properties.setAutoplayed(key, true);
-				PacketHandler.INSTANCE.sendTo(new PacketClientNotification(key.page, key.dimension, PacketClientNotification.AUTOPLAY), (EntityPlayerMP) player);
-			}
-		}
-	}
+            if (lore.autoplay && properties.canAutoplay(key)) {
+                properties.setAutoplayed(key, true);
+                PacketHandler.INSTANCE.sendTo(new PacketClientNotification(key.page, key.dimension, PacketClientNotification.AUTOPLAY), (EntityPlayerMP) player);
+            }
+        }
+    }
 
-	public World getClientWorld() {
-		return null;
-	}
-
+    public World getClientWorld() {
+        return null;
+    }
 }

@@ -6,6 +6,6 @@ import java.util.Map;
 
 public class LoreTags {
 
-	public String defaultTag = "(%s) Lore Pages:";
-	public Map<Integer, String> mapping = Maps.newHashMap();
+    public String defaultTag = "(%s) Lore Pages:";
+    public Map<Integer, String> mapping = Maps.newHashMap();
 }

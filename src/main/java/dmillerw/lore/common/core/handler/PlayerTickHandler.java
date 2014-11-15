@@ -29,30 +29,30 @@ public class PlayerTickHandler {
 
     private boolean notifiedThisTick = false;
 
-	@SubscribeEvent
-	public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-		if (event.phase == TickEvent.Phase.START && event.side == Side.SERVER) {
-			if (!event.player.capabilities.isCreativeMode) {
-				for (int i=0; i<event.player.inventory.getSizeInventory(); i++) {
-					ItemStack stack = event.player.inventory.getStackInSlot(i);
+    @SubscribeEvent
+    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        if (event.phase == TickEvent.Phase.START && event.side == Side.SERVER) {
+            if (!event.player.capabilities.isCreativeMode) {
+                for (int i = 0; i < event.player.inventory.getSizeInventory(); i++) {
+                    ItemStack stack = event.player.inventory.getStackInSlot(i);
 
-					if (stack != null && stack.getItem() == LoreExpansion.lorePage) {
-						LoreKey key = ItemLorePage.getLore(stack);
-						if (key != null) {
-							Lore lore = LoreLoader.INSTANCE.getLore(key);
+                    if (stack != null && stack.getItem() == LoreExpansion.lorePage) {
+                        LoreKey key = ItemLorePage.getLore(stack);
+                        if (key != null) {
+                            Lore lore = LoreLoader.INSTANCE.getLore(key);
 
-							if (lore == null) {
-								LoreExpansion.logger.warn("Found item with invalid lore. Resetting");
-								stack.setTagCompound(new NBTTagCompound());
-								return;
-							}
+                            if (lore == null) {
+                                LoreExpansion.logger.warn("Found item with invalid lore. Resetting");
+                                stack.setTagCompound(new NBTTagCompound());
+                                return;
+                            }
 
-							PlayerHandler.getCollectedLore(event.player).addLore(key);
+                            PlayerHandler.getCollectedLore(event.player).addLore(key);
 
-							PacketSyncLore.updateLore((EntityPlayerMP) event.player);
+                            PacketSyncLore.updateLore((EntityPlayerMP) event.player);
 
                             // Pickup notification packet
-							PacketHandler.INSTANCE.sendTo(new PacketClientNotification(key.page, key.dimension, PacketClientNotification.PICKUP), (EntityPlayerMP) event.player);
+                            PacketHandler.INSTANCE.sendTo(new PacketClientNotification(key.page, key.dimension, PacketClientNotification.PICKUP), (EntityPlayerMP) event.player);
 
                             // Autoplay handling
                             LoreProperties properties = PlayerHandler.getCollectedLore(event.player);
@@ -62,29 +62,28 @@ public class PlayerTickHandler {
                                 PacketHandler.INSTANCE.sendTo(new PacketClientNotification(key.page, key.dimension, PacketClientNotification.AUTOPLAY), (EntityPlayerMP) event.player);
                             }
 
-							CommandHandler ch = (CommandHandler) MinecraftServer.getServer().getCommandManager();
-							LoreCommandSender commandSender = new LoreCommandSender(event.player);
-							for (String str : lore.commands.pickup) {
-								ch.executeCommand(commandSender, str);
-							}
+                            CommandHandler ch = (CommandHandler) MinecraftServer.getServer().getCommandManager();
+                            LoreCommandSender commandSender = new LoreCommandSender(event.player);
+                            for (String str : lore.commands.pickup) {
+                                ch.executeCommand(commandSender, str);
+                            }
 
-							if (lore.notify && !notifiedThisTick) {
-								event.player.addChatComponentMessage(new ChatComponentText("You've discovered a new lore page. Press " + Keyboard.getKeyName(KeyHandler.INSTANCE.key.getKeyCode()) + " to view"));
+                            if (lore.notify && !notifiedThisTick) {
+                                event.player.addChatComponentMessage(new ChatComponentText("You've discovered a new lore page. Press " + Keyboard.getKeyName(KeyHandler.INSTANCE.key.getKeyCode()) + " to view"));
 //								notifiedThisTick = true;
-							}
+                            }
 
-							event.player.inventory.setInventorySlotContents(i, null);
-							event.player.inventory.markDirty();
+                            event.player.inventory.setInventorySlotContents(i, null);
+                            event.player.inventory.markDirty();
 
                             return;
-						}
+                        }
 
                         // Only set this to false if no lore has been updated this tick
                         notifiedThisTick = false;
-					}
-				}
-			}
-		}
-	}
-
+                    }
+                }
+            }
+        }
+    }
 }
