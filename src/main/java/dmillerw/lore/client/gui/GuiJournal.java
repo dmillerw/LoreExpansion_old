@@ -155,13 +155,14 @@ public class GuiJournal extends GuiScreen {
 		// LORE BACKGROUNDS
 		for (Lore lore : all) {
 			if (lore != null && lore.validDimension(dimension)) {
-				int page = lore.page - (4 * loreScrollIndex);
+//				int page = lore.page - (4 * loreScrollIndex);
+				int page = Math.min(lore.page, 35);
 
 				if (page > 0 && page < 35) {
-					int drawX = (((page - 1) % 4) * LORE_BOX_GAP);
+					int drawX = (((page - 1) % 5) * LORE_BOX_GAP);
 					int drawY = 0;
 					if ((page - 1) > 4) {
-						drawY = (((page - 1) / 4) * LORE_BOX_GAP);
+						drawY = (((page - 1) / 5) * LORE_BOX_GAP);
 					}
 
 					if (selectedLore != null && selectedLore.page == lore.page) {
@@ -179,13 +180,14 @@ public class GuiJournal extends GuiScreen {
 		for (LoreKey key : playerLore) {
 			Lore lore = LoreLoader.INSTANCE.getLore(key);
 			if (lore != null && lore.validDimension(dimension)) {
-				int page = lore.page - (4 * loreScrollIndex);
+//				int page = lore.page - (4 * loreScrollIndex);
+				int page = Math.min(lore.page, 35);
 
 				if (page > 0 && page < 35) {
-					int drawX = (((page - 1) % 4) * LORE_BOX_GAP);
+					int drawX = (((page - 1) % 5) * LORE_BOX_GAP);
 					int drawY = 0;
 					if ((page - 1) > 4) {
-						drawY = (((page - 1) / 4) * LORE_BOX_GAP);
+						drawY = (((page - 1) / 5) * LORE_BOX_GAP);
 					}
 
 					drawTexturedModelRectFromIcon(left + BOX_START.left + drawX + 1, top + BOX_START.right + drawY + 1, icon, 16, 16);
@@ -254,13 +256,14 @@ public class GuiJournal extends GuiScreen {
 		for (LoreKey key : playerLore) {
 			Lore lore = LoreLoader.INSTANCE.getLore(key);
 			if (lore != null && lore.validDimension(dimension)) {
-				int page = lore.page - (4 * loreScrollIndex);
+//				int page = lore.page - (4 * loreScrollIndex);
+				int page = Math.min(lore.page, 35);
 
 				if (page > 0 && page < 35) {
-					int drawX = (((page - 1) % 4) * LORE_BOX_GAP);
+					int drawX = (((page - 1) % 5) * LORE_BOX_GAP);
 					int drawY = 0;
 					if ((page - 1) > 4) {
-						drawY = (((page - 1) / 4) * LORE_BOX_GAP);
+						drawY = (((page - 1) / 5) * LORE_BOX_GAP);
 					}
 
 					if (inBounds(left + BOX_START.left + drawX, top + BOX_START.right + drawY, 16, 16, x, y)) {
@@ -301,13 +304,14 @@ public class GuiJournal extends GuiScreen {
 		for (LoreKey key : playerLore) {
 			Lore lore = LoreLoader.INSTANCE.getLore(key);
 			if (lore != null && lore.validDimension(dimension)) {
-				int page = lore.page - (4 * loreScrollIndex);
+//				int page = lore.page - (4 * loreScrollIndex);
+				int page = Math.min(lore.page, 35);
 
 				if (page > 0 && page < 35) {
-					int drawX = (((page - 1) % 4) * LORE_BOX_GAP);
+					int drawX = (((page - 1) % 5) * LORE_BOX_GAP);
 					int drawY = 0;
 					if ((page - 1) > 4) {
-						drawY = (((page - 1) / 4) * LORE_BOX_GAP);
+						drawY = (((page - 1) / 5) * LORE_BOX_GAP);
 					}
 
 					if (inBounds(left + BOX_START.left + drawX, top + BOX_START.right + drawY, 16, 16, x, y)) {
