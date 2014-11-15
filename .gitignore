@@ -9,7 +9,7 @@
 !/gradlew
 !/README
 !/LICENSE
-!/build.properties
+!/gradle.properties
 !/build.gradle
 !/.travis.yml
 !/build.sh
