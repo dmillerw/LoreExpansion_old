@@ -15,8 +15,10 @@ import dmillerw.lore.common.lore.data.LoreKey;
 import dmillerw.lore.common.network.packet.INotificationPacket;
 import dmillerw.lore.common.network.packet.PacketClientNotification;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import org.lwjgl.input.Keyboard;
 
 /**
  * @author dmillerw
@@ -43,6 +45,9 @@ public class ClientProxy extends CommonProxy {
         LoreKey key = packet.getData();
         if (packet.getType() == PacketClientNotification.PICKUP) {
             ClientProxy.pickedUpPage = key.copy();
+            if (LoreLoader.INSTANCE.getLore(key).notify) {
+                Minecraft.getMinecraft().thePlayer.addChatComponentMessage(new ChatComponentText("You've discovered a new lore page. Press " + Keyboard.getKeyName(KeyHandler.INSTANCE.key.getKeyCode()) + " to view"));
+            }
 //			PacketHandler.INSTANCE.sendToServer(new PacketServerNotification(key.page, key.dimension, PacketServerNotification.CONFIRM_AUTOPLAY));
         }
 

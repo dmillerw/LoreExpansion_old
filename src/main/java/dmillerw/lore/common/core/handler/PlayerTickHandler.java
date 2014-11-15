@@ -19,8 +19,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatComponentText;
-import org.lwjgl.input.Keyboard;
 
 /**
  * @author dmillerw
@@ -66,11 +64,6 @@ public class PlayerTickHandler {
                             LoreCommandSender commandSender = new LoreCommandSender(event.player);
                             for (String str : lore.commands.pickup) {
                                 ch.executeCommand(commandSender, str);
-                            }
-
-                            if (lore.notify && !notifiedThisTick) {
-                                event.player.addChatComponentMessage(new ChatComponentText("You've discovered a new lore page. Press " + Keyboard.getKeyName(KeyHandler.INSTANCE.key.getKeyCode()) + " to view"));
-//								notifiedThisTick = true;
                             }
 
                             event.player.inventory.setInventorySlotContents(i, null);
