@@ -12,6 +12,7 @@ import dmillerw.lore.common.lore.json.LoreDeserializer;
 import dmillerw.lore.common.lore.json.TagDeserializer;
 import dmillerw.lore.common.lore.json.TagSerializer;
 import dmillerw.lore.common.misc.FileHelper;
+import net.minecraft.world.WorldProvider;
 import net.minecraftforge.common.DimensionManager;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -67,6 +68,8 @@ public class LoreLoader {
 
     private Map<LoreKey, Lore> lore = Maps.newHashMap();
 
+    private Map<Integer, String> dimensionNameCache = Maps.newHashMap();
+
     private LoreTags loreTags = new LoreTags();
 
     public int[] getAllDimensions() {
@@ -84,7 +87,32 @@ public class LoreLoader {
     }
 
     private String getDimensionName(int dimension) {
-        return dimension == Integer.MAX_VALUE ? "Global" : DimensionManager.getProvider(dimension).getDimensionName();
+        try {
+            if (dimensionNameCache.containsKey(dimension)) {
+                return dimensionNameCache.get(dimension);
+            } else {
+                WorldProvider worldProvider = DimensionManager.createProviderFor(dimension);
+                String name = "";
+                if (worldProvider != null) {
+                    name = worldProvider.getDimensionName();
+                }
+                dimensionNameCache.put(dimension, name);
+                return name;
+            }
+        } catch (RuntimeException ex) {
+            // Plz don't crash :P
+            dimensionNameCache.put(dimension, "");
+            return "";
+        }
+    }
+
+    private String interpretDimensionName(int dimension) {
+        switch (dimension) {
+            case -1: return "Nether";
+            case 0: return "Overworld";
+            case 1: return "End";
+            default: return getDimensionName(dimension);
+        }
     }
 
     public String getLoreTag(int dimension) {
@@ -92,7 +120,7 @@ public class LoreLoader {
         if (loreTags.mapping.containsKey(dimension)) {
             tag = loreTags.mapping.get(dimension);
         }
-        return String.format(tag, getDimensionName(dimension));
+        return String.format(tag, interpretDimensionName(dimension));
     }
 
     public Lore getLore(int page, int dimension) {
