@@ -12,6 +12,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import dmillerw.lore.common.command.CommandLore;
 import dmillerw.lore.common.core.GuiHandler;
 import dmillerw.lore.common.core.handler.DefaultFileHandler;
+import dmillerw.lore.common.core.handler.PlayerSpawnHandler;
 import dmillerw.lore.common.core.handler.PlayerTickHandler;
 import dmillerw.lore.common.item.ItemJournal;
 import dmillerw.lore.common.item.ItemLorePage;
@@ -19,6 +20,8 @@ import dmillerw.lore.common.lore.LoreLoader;
 import dmillerw.lore.common.network.NetworkEventHandler;
 import dmillerw.lore.common.network.packet.PacketHandler;
 import net.minecraft.item.Item;
+import net.minecraftforge.common.MinecraftForge;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -83,12 +86,14 @@ public class LoreExpansion {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-        NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
+    	NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
     }
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         proxy.postInit(event);
+
+        MinecraftForge.EVENT_BUS.register(new PlayerSpawnHandler());
     }
 
     @Mod.EventHandler
