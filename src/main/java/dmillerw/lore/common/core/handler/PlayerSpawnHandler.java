@@ -1,6 +1,7 @@
 package dmillerw.lore.common.core.handler;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -26,13 +27,12 @@ public class PlayerSpawnHandler {
 		// This will copy the data from the old entity to the new one.
 		Side side = FMLCommonHandler.instance().getEffectiveSide();
 		if (side == Side.SERVER) {
-			/*
 			NBTTagCompound temp = new NBTTagCompound();
 			PlayerHandler.getCollectedLore( event.original ).saveNBTData(temp);
-			PlayerHandler.attach(event.entityPlayer);
+			//PlayerHandler.attach(event.entityPlayer);
 			PlayerHandler.getCollectedLore(event.entityPlayer).loadNBTData(temp);
-			 */
-			event.entityPlayer.registerExtendedProperties(PlayerHandler.LORE_PROPERTIES, PlayerHandler.getCollectedLore(event.original));
+
+			//event.entityPlayer.registerExtendedProperties(PlayerHandler.LORE_PROPERTIES, PlayerHandler.getCollectedLore(event.original));
 		}
 	}
 
