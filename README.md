@@ -1,2 +1,2 @@
 # LoreExpansion
-## INFO
+## Info
