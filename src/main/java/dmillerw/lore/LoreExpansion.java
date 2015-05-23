@@ -11,6 +11,7 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import dmillerw.lore.common.command.CommandLore;
 import dmillerw.lore.common.core.GuiHandler;
+import dmillerw.lore.common.core.handler.CommandDelayHandler;
 import dmillerw.lore.common.core.handler.DefaultFileHandler;
 import dmillerw.lore.common.core.handler.PlayerSpawnHandler;
 import dmillerw.lore.common.core.handler.PlayerTickHandler;
@@ -80,6 +81,7 @@ public class LoreExpansion {
 
         FMLCommonHandler.instance().bus().register(new NetworkEventHandler());
         FMLCommonHandler.instance().bus().register(new PlayerTickHandler());
+        FMLCommonHandler.instance().bus().register(new CommandDelayHandler());
 
         proxy.preInit(event);
     }

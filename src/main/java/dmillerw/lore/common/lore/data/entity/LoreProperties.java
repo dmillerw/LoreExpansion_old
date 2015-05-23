@@ -60,6 +60,10 @@ public class LoreProperties implements IExtendedEntityProperties {
         autoplayed.clear();
     }
 
+    public boolean hasLore(LoreKey key) {
+        return collectedLore.contains(key);
+    }
+
     public void addLore(LoreKey key) {
         collectedLore.add(key);
     }

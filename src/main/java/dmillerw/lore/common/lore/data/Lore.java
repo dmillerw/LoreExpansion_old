@@ -5,18 +5,16 @@ package dmillerw.lore.common.lore.data;
  */
 public class Lore {
 
-    public static class CommandWrapper {
-
-        public String[] pickup = new String[0];
-    }
-
     public int page;
     public int dimension = Integer.MAX_VALUE; // Default
+
     public String title = "";
     public String body = "";
     public String sound = "";
-    public CommandWrapper commands = new CommandWrapper();
-    public boolean autoplay = false;
+
+    public Commands commands = Commands.BLANK;
+
+    public boolean autoplay = true;
     public boolean notify = true;
 
     public boolean hasSound() {

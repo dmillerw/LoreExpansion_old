@@ -4,13 +4,11 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dmillerw.lore.LoreExpansion;
+import dmillerw.lore.common.lore.data.Commands;
 import dmillerw.lore.common.lore.data.Lore;
 import dmillerw.lore.common.lore.data.LoreKey;
 import dmillerw.lore.common.lore.data.LoreTags;
-import dmillerw.lore.common.lore.json.CommandDeserializer;
-import dmillerw.lore.common.lore.json.LoreDeserializer;
-import dmillerw.lore.common.lore.json.TagDeserializer;
-import dmillerw.lore.common.lore.json.TagSerializer;
+import dmillerw.lore.common.lore.data.json.CommandDeserializer;
 import dmillerw.lore.common.misc.FileHelper;
 import net.minecraft.world.WorldProvider;
 import net.minecraftforge.common.DimensionManager;
@@ -48,7 +46,7 @@ public class LoreLoader {
             try {
                 LoreLoader.INSTANCE.saveDefaultLoreTags(tagFile);
             } catch (IOException ex) {
-                LoreExpansion.logger.warn(String.format("Failed to save default tags.json. This isn't a huge issue."));
+                LoreExpansion.logger.warn("Failed to save default tags.json. This isn't a huge issue.");
             }
         }
     }
@@ -59,10 +57,7 @@ public class LoreLoader {
 
     static {
         GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(Lore.class, new LoreDeserializer());
-        builder.registerTypeAdapter(LoreTags.class, new TagDeserializer());
-        builder.registerTypeAdapter(LoreTags.class, new TagSerializer());
-        builder.registerTypeAdapter(Lore.CommandWrapper.class, new CommandDeserializer());
+        builder.registerTypeAdapter(Commands.class, new CommandDeserializer());
         gson = builder.create();
     }
 

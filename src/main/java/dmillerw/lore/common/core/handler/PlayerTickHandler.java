@@ -8,6 +8,7 @@ import dmillerw.lore.common.command.LoreCommandSender;
 import dmillerw.lore.common.item.ItemLorePage;
 import dmillerw.lore.common.lore.LoreLoader;
 import dmillerw.lore.common.lore.PlayerHandler;
+import dmillerw.lore.common.lore.data.Commands;
 import dmillerw.lore.common.lore.data.Lore;
 import dmillerw.lore.common.lore.data.LoreKey;
 import dmillerw.lore.common.lore.data.entity.LoreProperties;
@@ -45,25 +46,32 @@ public class PlayerTickHandler {
                                 return;
                             }
 
-                            PlayerHandler.getCollectedLore(event.player).addLore(key);
+                            LoreProperties collectedLore = PlayerHandler.getCollectedLore(event.player);
+                            if (!collectedLore.hasLore(key)) {
+                                collectedLore.addLore(key);
 
-                            PacketSyncLore.updateLore((EntityPlayerMP) event.player);
+                                PacketSyncLore.updateLore((EntityPlayerMP) event.player);
 
-                            // Pickup notification packet
-                            PacketHandler.INSTANCE.sendTo(new PacketClientNotification(key.page, key.dimension, PacketClientNotification.PICKUP), (EntityPlayerMP) event.player);
+                                // Pickup notification packet
+                                PacketHandler.INSTANCE.sendTo(new PacketClientNotification(key.page, key.dimension, PacketClientNotification.PICKUP), (EntityPlayerMP) event.player);
 
-                            // Autoplay handling
-                            LoreProperties properties = PlayerHandler.getCollectedLore(event.player);
+                                // Autoplay handling
+                                LoreProperties properties = PlayerHandler.getCollectedLore(event.player);
 
-                            if (lore.autoplay && properties.canAutoplay(key)) {
-                                properties.setAutoplayed(key, true);
-                                PacketHandler.INSTANCE.sendTo(new PacketClientNotification(key.page, key.dimension, PacketClientNotification.AUTOPLAY), (EntityPlayerMP) event.player);
-                            }
+                                if (lore.autoplay && properties.canAutoplay(key)) {
+                                    properties.setAutoplayed(key, true);
+                                    PacketHandler.INSTANCE.sendTo(new PacketClientNotification(key.page, key.dimension, PacketClientNotification.AUTOPLAY), (EntityPlayerMP) event.player);
+                                }
 
-                            CommandHandler ch = (CommandHandler) MinecraftServer.getServer().getCommandManager();
-                            LoreCommandSender commandSender = new LoreCommandSender(event.player);
-                            for (String str : lore.commands.pickup) {
-                                ch.executeCommand(commandSender, str);
+                                for (Commands.CommandEntry command : lore.commands.commands) {
+                                    if (command.delay > 0) {
+                                        CommandDelayHandler.queueCommand(event.player, command);
+                                    } else {
+                                        CommandHandler ch = (CommandHandler) MinecraftServer.getServer().getCommandManager();
+                                        LoreCommandSender commandSender = new LoreCommandSender(event.player);
+                                        ch.executeCommand(commandSender, command.command);
+                                    }
+                                }
                             }
 
                             event.player.inventory.setInventorySlotContents(i, null);
