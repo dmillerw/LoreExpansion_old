@@ -18,7 +18,7 @@ public class CommandDeserializer implements JsonDeserializer<Commands> {
             entries.add(new Commands.CommandEntry(json.getAsString(), 0));
         } else if (json.isJsonArray()) { // Array of either Strings, or command objects
             JsonArray array = json.getAsJsonArray();
-            for (int i=0; i<array.size(); i++) {
+            for (int i = 0; i < array.size(); i++) {
                 entries.addAll(Arrays.asList(deserialize(array.get(i), typeOfT, context).commands)); // Such a hack
             }
         } else if (json.isJsonObject()) { // Single command object

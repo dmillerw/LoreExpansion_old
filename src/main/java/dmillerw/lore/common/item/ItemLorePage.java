@@ -63,7 +63,7 @@ public class ItemLorePage extends Item {
             if (player.capabilities.isCreativeMode) {
                 LoreKey key = ItemLorePage.getLore(stack);
                 if (key != null) {
-                    Lore data = LoreLoader.INSTANCE.getLore(key);
+                    Lore data = LoreLoader.getLore(key);
 
                     if (data == null) {
                         LoreExpansion.logger.warn("Found item with invalid lore. Resetting");
@@ -86,7 +86,7 @@ public class ItemLorePage extends Item {
     public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean debug) {
         LoreKey key = ItemLorePage.getLore(stack);
         if (key != null) {
-            Lore data = LoreLoader.INSTANCE.getLore(key);
+            Lore data = LoreLoader.getLore(key);
 
             if (data == null) {
                 LoreExpansion.logger.warn("Found item with invalid lore. Resetting");
@@ -106,7 +106,7 @@ public class ItemLorePage extends Item {
 
     @Override
     public void getSubItems(Item item, CreativeTabs tab, List list) {
-        for (Lore data : LoreLoader.INSTANCE.getAllLore()) {
+        for (Lore data : LoreLoader.getAllLore()) {
             if (data != null) {
                 ItemStack stack = new ItemStack(this);
                 ItemLorePage.setLore(stack, new LoreKey(data));

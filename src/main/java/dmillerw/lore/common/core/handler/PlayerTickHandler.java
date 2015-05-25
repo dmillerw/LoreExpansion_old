@@ -38,7 +38,7 @@ public class PlayerTickHandler {
                     if (stack != null && stack.getItem() == LoreExpansion.lorePage) {
                         LoreKey key = ItemLorePage.getLore(stack);
                         if (key != null) {
-                            Lore lore = LoreLoader.INSTANCE.getLore(key);
+                            Lore lore = LoreLoader.getLore(key);
 
                             if (lore == null) {
                                 LoreExpansion.logger.warn("Found item with invalid lore. Resetting");

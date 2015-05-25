@@ -1,17 +1,17 @@
 package dmillerw.lore.client.gui;
 
+import com.google.common.collect.Lists;
+import dmillerw.lore.ClientProxy;
 import dmillerw.lore.LoreExpansion;
 import dmillerw.lore.client.sound.SoundHandler;
 import dmillerw.lore.client.texture.SubTexture;
-import dmillerw.lore.ClientProxy;
+import dmillerw.lore.common.lib.Pair;
+import dmillerw.lore.common.lib.StringHelper;
 import dmillerw.lore.common.lore.LoreLoader;
 import dmillerw.lore.common.lore.data.Lore;
 import dmillerw.lore.common.lore.data.LoreKey;
-import dmillerw.lore.common.misc.Pair;
-import dmillerw.lore.common.misc.StringHelper;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
@@ -49,21 +49,21 @@ public class GuiJournal extends GuiScreen {
     private static final SubTexture STOP_BUTTON_ACTIVE = new SubTexture(JOURNAL_RIGHT, 170, 192, 5, 5);
     private static final SubTexture STOP_BUTTON_INACTIVE = new SubTexture(JOURNAL_RIGHT, 170, 185, 5, 5);
 
-    private static final Pair<Integer, Integer> LEFT_SIZE = new Pair<Integer, Integer>(175, 230);
-    private static final Pair<Integer, Integer> RIGHT_SIZE = new Pair<Integer, Integer>(168, 230);
-    private static final Pair<Integer, Integer> TOTAL_SIZE = new Pair<Integer, Integer>(LEFT_SIZE.left + RIGHT_SIZE.left, 230);
-    private static final Pair<Integer, Integer> BOX_START = new Pair<Integer, Integer>(35, 45);
-    private static final Pair<Integer, Integer> TAB_SIZE = new Pair<Integer, Integer>(15, 26);
-    private static final Pair<Integer, Integer> TAB_BACK = new Pair<Integer, Integer>(0, 16);
-    private static final Pair<Integer, Integer> TAB_FORWARD = new Pair<Integer, Integer>(0, 46);
-    private static final Pair<Integer, Integer> ARROW_DIMENSION_BACK_POS = new Pair<Integer, Integer>(5, 25);
-    private static final Pair<Integer, Integer> ARROW_DIMENSION_FORWARD_POS = new Pair<Integer, Integer>(5, 55);
-    private static final Pair<Integer, Integer> ARROW_PAGE_SIZE = new Pair<Integer, Integer>(12, 12);
-    private static final Pair<Integer, Integer> ARROW_PAGE_BACK_POS = new Pair<Integer, Integer>(20, 206);
-    private static final Pair<Integer, Integer> ARROW_PAGE_FORWARD_POS = new Pair<Integer, Integer>(148, 206);
-    private static final Pair<Integer, Integer> PLAY_POS = new Pair<Integer, Integer>(122, 203);
-    private static final Pair<Integer, Integer> PAUSE_POS = new Pair<Integer, Integer>(122, 204);
-    private static final Pair<Integer, Integer> STOP_POS = new Pair<Integer, Integer>(41, 204);
+    private static final Pair<Integer, Integer> LEFT_SIZE = Pair.of(175, 230);
+    private static final Pair<Integer, Integer> RIGHT_SIZE = Pair.of(168, 230);
+    private static final Pair<Integer, Integer> TOTAL_SIZE = Pair.of(LEFT_SIZE.left + RIGHT_SIZE.left, 230);
+    private static final Pair<Integer, Integer> BOX_START = Pair.of(35, 45);
+    private static final Pair<Integer, Integer> TAB_SIZE = Pair.of(15, 26);
+    private static final Pair<Integer, Integer> TAB_BACK = Pair.of(0, 16);
+    private static final Pair<Integer, Integer> TAB_FORWARD = Pair.of(0, 46);
+    private static final Pair<Integer, Integer> ARROW_DIMENSION_BACK_POS = Pair.of(5, 25);
+    private static final Pair<Integer, Integer> ARROW_DIMENSION_FORWARD_POS = Pair.of(5, 55);
+    private static final Pair<Integer, Integer> ARROW_PAGE_SIZE = Pair.of(12, 12);
+    private static final Pair<Integer, Integer> ARROW_PAGE_BACK_POS = Pair.of(20, 206);
+    private static final Pair<Integer, Integer> ARROW_PAGE_FORWARD_POS = Pair.of(148, 206);
+    private static final Pair<Integer, Integer> PLAY_POS = Pair.of(122, 203);
+    private static final Pair<Integer, Integer> PAUSE_POS = Pair.of(122, 204);
+    private static final Pair<Integer, Integer> STOP_POS = Pair.of(41, 204);
 
     private static final float TEXT_SCALE = 1F;
 
@@ -81,7 +81,7 @@ public class GuiJournal extends GuiScreen {
 
     public static int loreScrollIndex = 0;
     public static int textScrollIndex = 0;
-    public static List<LoreKey> playerLore = new ArrayList<LoreKey>();
+    public static List<LoreKey> playerLore = Lists.newArrayList();
     public static LoreKey selectedLore;
 
     private static int[] dimensions = new int[]{Integer.MAX_VALUE};
@@ -90,16 +90,10 @@ public class GuiJournal extends GuiScreen {
 
     private List<String> currentLore = new ArrayList<String>();
 
-    private final EntityPlayer player;
-
-    public GuiJournal(EntityPlayer player) {
-        this.player = player;
-    }
-
     @Override
     public void initGui() {
         // Fill dimensions array and set index
-        int[] dims = LoreLoader.INSTANCE.getAllDimensions();
+        int[] dims = LoreLoader.getAllDimensions();
         if (dims.length > 0) {
             GuiJournal.dimensions = dims;
         }
@@ -136,13 +130,13 @@ public class GuiJournal extends GuiScreen {
         int top = (height - TOTAL_SIZE.right) / 2;
         Lore current = null;
         if (selectedLore != null) {
-            current = LoreLoader.INSTANCE.getLore(selectedLore);
+            current = LoreLoader.getLore(selectedLore);
 
             if (current == null) {
                 selectedLore = null;
             }
         }
-        Lore[] all = LoreLoader.INSTANCE.getAllLore();
+        Lore[] all = LoreLoader.getAllLore();
         int dimension = dimensions[dimensionIndex];
 
         // BACKGROUND
@@ -178,7 +172,7 @@ public class GuiJournal extends GuiScreen {
         mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
         IIcon icon = LoreExpansion.lorePage.getIconFromDamage(0);
         for (LoreKey key : playerLore) {
-            Lore lore = LoreLoader.INSTANCE.getLore(key);
+            Lore lore = LoreLoader.getLore(key);
             if (lore != null && lore.validDimension(dimension)) {
 //				int page = lore.page - (4 * loreScrollIndex);
                 int page = Math.min(lore.page, 35);
@@ -254,7 +248,7 @@ public class GuiJournal extends GuiScreen {
 
         // LORE TOOLTIPS
         for (LoreKey key : playerLore) {
-            Lore lore = LoreLoader.INSTANCE.getLore(key);
+            Lore lore = LoreLoader.getLore(key);
             if (lore != null && lore.validDimension(dimension)) {
 //				int page = lore.page - (4 * loreScrollIndex);
                 int page = Math.min(lore.page, 35);
@@ -274,7 +268,7 @@ public class GuiJournal extends GuiScreen {
         }
 
         // TEXT - LEFT
-        String tag = LoreLoader.INSTANCE.getLoreTag(dimension);
+        String tag = LoreLoader.getLoreTag(dimension);
         drawCenteredString(tag, (left + (LEFT_SIZE.left - 8) / 2) + 8, top + TITLE_Y, 0x000000);
 
         // TEXT - RIGHT
@@ -293,7 +287,7 @@ public class GuiJournal extends GuiScreen {
         int top = (height - TOTAL_SIZE.right) / 2;
         Lore current = null;
         if (selectedLore != null) {
-            current = LoreLoader.INSTANCE.getLore(selectedLore);
+            current = LoreLoader.getLore(selectedLore);
 
             if (current == null) {
                 selectedLore = null;
@@ -302,7 +296,7 @@ public class GuiJournal extends GuiScreen {
         int dimension = dimensions[dimensionIndex];
 
         for (LoreKey key : playerLore) {
-            Lore lore = LoreLoader.INSTANCE.getLore(key);
+            Lore lore = LoreLoader.getLore(key);
             if (lore != null && lore.validDimension(dimension)) {
 //				int page = lore.page - (4 * loreScrollIndex);
                 int page = Math.min(lore.page, 35);
@@ -383,7 +377,7 @@ public class GuiJournal extends GuiScreen {
 
     public void reset() {
         int max = 0;
-        for (Lore lore : LoreLoader.INSTANCE.getAllLore()) {
+        for (Lore lore : LoreLoader.getAllLore()) {
             if (lore != null && lore.validDimension(dimensions[dimensionIndex]) && lore.page > max) {
                 max = lore.page;
             }
@@ -399,7 +393,7 @@ public class GuiJournal extends GuiScreen {
         currentLore.clear();
         selectedLore = key;
 
-        String[] lore = LoreLoader.INSTANCE.getLore(selectedLore).body.split("[\r\n]");
+        String[] lore = LoreLoader.getLore(selectedLore).body.split("[\r\n]");
         List<String> newList = new ArrayList<String>();
 
         for (int i = 0; i < lore.length; i++) {

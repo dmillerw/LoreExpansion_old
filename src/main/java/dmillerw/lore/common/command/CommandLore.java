@@ -49,7 +49,7 @@ public class CommandLore extends CommandBase {
         }
 
         if (args[0].equalsIgnoreCase("reload")) {
-            LoreLoader.INSTANCE.clear();
+            LoreLoader.clear();
             LoreLoader.initialize();
             sender.addChatMessage(new ChatComponentText(EnumChatFormatting.RED + "Reloaded Lore"));
         } else if (args[0].equalsIgnoreCase("clear")) {

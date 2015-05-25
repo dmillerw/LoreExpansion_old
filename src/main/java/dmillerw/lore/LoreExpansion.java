@@ -1,6 +1,5 @@
 package dmillerw.lore;
 
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -8,21 +7,10 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.registry.GameRegistry;
 import dmillerw.lore.common.command.CommandLore;
 import dmillerw.lore.common.core.GuiHandler;
-import dmillerw.lore.common.core.handler.CommandDelayHandler;
-import dmillerw.lore.common.core.handler.DefaultFileHandler;
-import dmillerw.lore.common.core.handler.PlayerSpawnHandler;
-import dmillerw.lore.common.core.handler.PlayerTickHandler;
-import dmillerw.lore.common.item.ItemJournal;
-import dmillerw.lore.common.item.ItemLorePage;
-import dmillerw.lore.common.lore.LoreLoader;
-import dmillerw.lore.common.network.NetworkEventHandler;
-import dmillerw.lore.common.network.packet.PacketHandler;
+import dmillerw.lore.common.lib.Files;
 import net.minecraft.item.Item;
-import net.minecraftforge.common.MinecraftForge;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -55,47 +43,23 @@ public class LoreExpansion {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        lorePage = new ItemLorePage().setUnlocalizedName("page");
-        GameRegistry.registerItem(lorePage, "page");
-
-        journal = new ItemJournal().setUnlocalizedName("journal");
-        GameRegistry.registerItem(journal, "journal");
-
-        configFolder = new File(event.getModConfigurationDirectory(), CONFIG_FOLDER);
-        loreFolder = new File(configFolder, LORE_FOLDER);
-        audioFolder = new File(loreFolder, AUDIO_FOLDER);
-        if (!configFolder.exists()) {
-            configFolder.mkdir();
-        }
-        if (!loreFolder.exists()) {
-            loreFolder.mkdir();
-        }
-        if (!audioFolder.exists()) {
-            audioFolder.mkdir();
-        }
-
-        DefaultFileHandler.initialize();
-        LoreLoader.initialize();
-
-        PacketHandler.init();
-
-        FMLCommonHandler.instance().bus().register(new NetworkEventHandler());
-        FMLCommonHandler.instance().bus().register(new PlayerTickHandler());
-        FMLCommonHandler.instance().bus().register(new CommandDelayHandler());
+        configFolder = Files.mkdir(event.getModConfigurationDirectory(), CONFIG_FOLDER);
+        loreFolder = Files.mkdir(configFolder, LORE_FOLDER);
+        audioFolder = Files.mkdir(loreFolder, AUDIO_FOLDER);
 
         proxy.preInit(event);
     }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-    	NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
+        NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
+
+        proxy.init(event);
     }
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         proxy.postInit(event);
-
-        MinecraftForge.EVENT_BUS.register(new PlayerSpawnHandler());
     }
 
     @Mod.EventHandler

@@ -6,10 +6,10 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import dmillerw.lore.ClientProxy;
 import dmillerw.lore.LoreExpansion;
 import dmillerw.lore.client.gui.GuiJournal;
 import dmillerw.lore.common.core.GuiHandler;
-import dmillerw.lore.ClientProxy;
 import net.minecraft.client.settings.KeyBinding;
 import org.lwjgl.input.Keyboard;
 
