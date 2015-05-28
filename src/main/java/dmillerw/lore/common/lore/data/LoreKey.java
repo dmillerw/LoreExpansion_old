@@ -8,39 +8,30 @@ import net.minecraft.nbt.NBTTagCompound;
 public class LoreKey {
 
     public static LoreKey fromNBT(NBTTagCompound nbt) {
-        int page = nbt.getInteger("page");
-        int dimension = nbt.getInteger("dimension");
-        return new LoreKey(page, dimension);
+        if (nbt == null)
+            return null;
+
+        return new LoreKey(nbt.getString("category"), nbt.getString("ident"));
     }
 
     public static LoreKey fromLore(Lore lore) {
-        return new LoreKey(lore.page, lore.dimension);
+        if (lore == null)
+            return null;
+
+        return new LoreKey(lore.category, lore.ident);
     }
 
-    public final int page;
-    public final int dimension;
+    public final String category;
+    public final String ident;
 
-    public LoreKey(Lore lore) {
-        this(lore.page, lore.dimension);
-    }
-
-    public LoreKey(int page) {
-        this(page, Integer.MAX_VALUE);
-    }
-
-    public LoreKey(int page, int dimension) {
-        this.page = page;
-        this.dimension = dimension;
-        ;
-    }
-
-    public boolean global() {
-        return dimension == Integer.MAX_VALUE;
+    public LoreKey(String category, String ident) {
+        this.category = category;
+        this.ident = ident;
     }
 
     public void writeToNBT(NBTTagCompound nbt) {
-        nbt.setInteger("page", page);
-        nbt.setInteger("dimension", dimension);
+        nbt.setString("category", category);
+        nbt.setString("ident", ident);
     }
 
     @Override
@@ -50,20 +41,19 @@ public class LoreKey {
 
         LoreKey loreKey = (LoreKey) o;
 
-        if (dimension != loreKey.dimension) return false;
-        if (page != loreKey.page) return false;
+        if (!category.equals(loreKey.category)) return false;
+        return ident.equals(loreKey.ident);
 
-        return true;
     }
 
     @Override
     public int hashCode() {
-        int result = page;
-        result = 31 * result + dimension;
+        int result = category.hashCode();
+        result = 31 * result + ident.hashCode();
         return result;
     }
 
     public LoreKey copy() {
-        return new LoreKey(this.page, this.dimension);
+        return new LoreKey(category, ident);
     }
 }

@@ -12,8 +12,7 @@ import dmillerw.lore.common.lore.data.Commands;
 import dmillerw.lore.common.lore.data.Lore;
 import dmillerw.lore.common.lore.data.LoreKey;
 import dmillerw.lore.common.lore.data.entity.LoreProperties;
-import dmillerw.lore.common.network.packet.PacketClientNotification;
-import dmillerw.lore.common.network.packet.PacketHandler;
+import dmillerw.lore.common.network.packet.PacketNotification;
 import dmillerw.lore.common.network.packet.PacketSyncLore;
 import net.minecraft.command.CommandHandler;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -52,15 +51,16 @@ public class PlayerTickHandler {
 
                                 PacketSyncLore.updateLore((EntityPlayerMP) event.player);
 
+
                                 // Pickup notification packet
-                                PacketHandler.INSTANCE.sendTo(new PacketClientNotification(key.page, key.dimension, PacketClientNotification.PICKUP), (EntityPlayerMP) event.player);
+                                PacketNotification.notify(event.player, PacketNotification.TYPE_CLIENT_PICKUP, key);
 
                                 // Autoplay handling
-                                LoreProperties properties = PlayerHandler.getCollectedLore(event.player);
 
+                                LoreProperties properties = PlayerHandler.getCollectedLore(event.player);
                                 if (lore.autoplay && properties.canAutoplay(key)) {
                                     properties.setAutoplayed(key, true);
-                                    PacketHandler.INSTANCE.sendTo(new PacketClientNotification(key.page, key.dimension, PacketClientNotification.AUTOPLAY), (EntityPlayerMP) event.player);
+                                    PacketNotification.notify(event.player, PacketNotification.TYPE_CLIENT_AUTOPLAY, key);
                                 }
 
                                 for (Commands.CommandEntry command : lore.commands.commands) {

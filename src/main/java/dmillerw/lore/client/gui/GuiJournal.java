@@ -78,45 +78,26 @@ public class GuiJournal extends GuiScreen {
     private static final int ARROW_SCROLL_DOWN_Y = 203;
 
     public static int maxPage = 0;
-
     public static int loreScrollIndex = 0;
     public static int textScrollIndex = 0;
+
     public static List<LoreKey> playerLore = Lists.newArrayList();
     public static LoreKey selectedLore;
 
-    private static int[] dimensions = new int[]{Integer.MAX_VALUE};
+    private static String currentCategory;
 
-    private static int dimensionIndex = Integer.MIN_VALUE;
-
-    private List<String> currentLore = new ArrayList<String>();
+    private static Lore currentLore;
+    private List<String> currentLoreText = new ArrayList<String>();
 
     @Override
     public void initGui() {
-        // Fill dimensions array and set index
-        int[] dims = LoreLoader.getAllDimensions();
-        if (dims.length > 0) {
-            GuiJournal.dimensions = dims;
-        }
-
-        if (dimensionIndex == Integer.MIN_VALUE || dimensionIndex >= dimensions.length) {
-            dimensionIndex = 0;
-        }
-
-        // Why was I resetting...? :/
-        //TODO Analyze
-//		reset();
+        if (currentCategory == null || currentCategory.isEmpty())
+            changeCategory(Lore.GLOBAL);
 
         // Open selected page
         if (selectedLore != null) {
-            for (int i = 0; i < dimensions.length; i++) {
-                if (dimensions[i] == selectedLore.dimension) {
-                    dimensionIndex = i;
-                    loadLore(selectedLore);
-                    ClientProxy.pickedUpPage = null;
-                    return;
-                }
-            }
-            selectedLore = null;
+            currentCategory = selectedLore.category;
+            changeLore(selectedLore);
             ClientProxy.pickedUpPage = null;
         }
     }
@@ -215,7 +196,7 @@ public class GuiJournal extends GuiScreen {
                 ARROW_SCROLL_UP.draw(left + LEFT_SIZE.left + ARROW_SCROLL_X, top + ARROW_SCROLL_UP_Y, (int) zLevel);
             }
 
-            if (currentLore.size() - LORE_ROW_COUNT > textScrollIndex) {
+            if (currentLoreText.size() - LORE_ROW_COUNT > textScrollIndex) {
                 ARROW_SCROLL_DOWN.draw(left + LEFT_SIZE.left + ARROW_SCROLL_X, top + ARROW_SCROLL_DOWN_Y, (int) zLevel);
             }
         }
@@ -274,8 +255,8 @@ public class GuiJournal extends GuiScreen {
         // TEXT - RIGHT
         if (current != null) {
             drawCenteredString(current.title, left + LEFT_SIZE.left + (RIGHT_SIZE.left / 2), top + TITLE_Y, 0x000000);
-            for (int i = textScrollIndex; i < Math.min(textScrollIndex + LORE_ROW_COUNT, currentLore.size()); i++) {
-                String lore = currentLore.get(i);
+            for (int i = textScrollIndex; i < Math.min(textScrollIndex + LORE_ROW_COUNT, currentLoreText.size()); i++) {
+                String lore = currentLoreText.get(i);
                 drawString(lore, left + LEFT_SIZE.left + BODY_X, (top + BODY_y + ClientProxy.renderer.FONT_HEIGHT) + ClientProxy.renderer.FONT_HEIGHT * (i - textScrollIndex), TEXT_SCALE, 0x000000, true);
             }
         }
@@ -310,7 +291,7 @@ public class GuiJournal extends GuiScreen {
 
                     if (inBounds(left + BOX_START.left + drawX, top + BOX_START.right + drawY, 16, 16, x, y)) {
                         selectedLore = new LoreKey(lore.page, dimension);
-                        loadLore(selectedLore);
+                        changeLore(selectedLore);
                     }
                 }
             }
@@ -385,15 +366,21 @@ public class GuiJournal extends GuiScreen {
         maxPage = max;
         selectedLore = null;
         textScrollIndex = 0;
-        currentLore.clear();
+        currentLoreText.clear();
         SoundHandler.INSTANCE.stop();
     }
 
-    public void loadLore(LoreKey key) {
-        currentLore.clear();
+    public void changeCategory(String category) {
+
+    }
+
+    public void changeLore(LoreKey key) {
+        currentLoreText.clear();
         selectedLore = key;
 
-        String[] lore = LoreLoader.getLore(selectedLore).body.split("[\r\n]");
+        currentLore = LoreLoader.getLore(key);
+
+        String[] lore = currentLore.body.split("[\r\n]");
         List<String> newList = new ArrayList<String>();
 
         for (int i = 0; i < lore.length; i++) {
@@ -411,7 +398,7 @@ public class GuiJournal extends GuiScreen {
         }
 
         for (String str : newList) {
-            currentLore.addAll(ClientProxy.renderer.listFormattedStringToWidth(str, (int) (((RIGHT_SIZE.left) - 45) / TEXT_SCALE)));
+            currentLoreText.addAll(ClientProxy.renderer.listFormattedStringToWidth(str, (int) (((RIGHT_SIZE.left) - 45) / TEXT_SCALE)));
         }
     }
 
@@ -470,8 +457,8 @@ public class GuiJournal extends GuiScreen {
 
         if (theta > 0) {
             textScrollIndex += 2;
-            if (textScrollIndex > Math.max(0, currentLore.size() - LORE_ROW_COUNT)) {
-                textScrollIndex = Math.max(0, currentLore.size() - LORE_ROW_COUNT);
+            if (textScrollIndex > Math.max(0, currentLoreText.size() - LORE_ROW_COUNT)) {
+                textScrollIndex = Math.max(0, currentLoreText.size() - LORE_ROW_COUNT);
             }
         }
     }

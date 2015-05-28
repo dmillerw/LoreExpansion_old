@@ -5,9 +5,10 @@ package dmillerw.lore.common.lore.data;
  */
 public class Lore {
 
-    public int page;
-    public int dimension = Integer.MAX_VALUE; // Default
+    public static final String GLOBAL = "GLOBAL";
 
+    public String category = GLOBAL;
+    public String ident = "";
     public String title = "";
     public String body = "";
     public String sound = "";
@@ -19,9 +20,5 @@ public class Lore {
 
     public boolean hasSound() {
         return !sound.isEmpty();
-    }
-
-    public boolean validDimension(int dimension) {
-        return this.dimension == dimension;
     }
 }

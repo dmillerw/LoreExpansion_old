@@ -17,12 +17,9 @@ import dmillerw.lore.common.lore.data.Lore;
 import dmillerw.lore.common.lore.data.LoreKey;
 import dmillerw.lore.common.lore.data.entity.LoreProperties;
 import dmillerw.lore.common.network.NetworkEventHandler;
-import dmillerw.lore.common.network.packet.INotificationPacket;
-import dmillerw.lore.common.network.packet.PacketClientNotification;
 import dmillerw.lore.common.network.packet.PacketHandler;
-import dmillerw.lore.common.network.packet.PacketServerNotification;
+import dmillerw.lore.common.network.packet.PacketNotification;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -55,17 +52,17 @@ public class CommonProxy {
         MinecraftForge.EVENT_BUS.register(new PlayerSpawnHandler());
     }
 
-    public void handleNotificationPacket(INotificationPacket packet, MessageContext context) {
-        if (packet.getType() == PacketServerNotification.CONFIRM_AUTOPLAY) {
+    public void handleNotificationPacket(PacketNotification packet, MessageContext context) {
+        if (packet.type == PacketNotification.TYPE_SERVER_AUTOPLAY_CONFIRM) {
             EntityPlayer player = context.getServerHandler().playerEntity;
-            LoreKey key = packet.getData();
+            LoreKey key = packet.key;
             Lore lore = LoreLoader.getLore(key);
 
             LoreProperties properties = PlayerHandler.getCollectedLore(player);
 
             if (lore.autoplay && properties.canAutoplay(key)) {
                 properties.setAutoplayed(key, true);
-                PacketHandler.INSTANCE.sendTo(new PacketClientNotification(key.page, key.dimension, PacketClientNotification.AUTOPLAY), (EntityPlayerMP) player);
+                PacketNotification.notify(player, PacketNotification.TYPE_CLIENT_AUTOPLAY, key);
             }
         }
     }

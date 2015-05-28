@@ -17,7 +17,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
 
 import java.util.List;
 
@@ -30,9 +29,9 @@ public class ItemLorePage extends Item {
         if (!stack.hasTagCompound()) {
             stack.setTagCompound(new NBTTagCompound());
         }
+
         NBTTagCompound nbt = stack.getTagCompound();
-        nbt.setInteger("page", key.page);
-        nbt.setInteger("dimension", key.dimension);
+        key.writeToNBT(nbt);
         stack.setTagCompound(nbt);
     }
 
@@ -40,10 +39,8 @@ public class ItemLorePage extends Item {
         if (!stack.hasTagCompound()) {
             return null;
         }
-        NBTTagCompound nbt = stack.getTagCompound();
-        int page = nbt.getInteger("page");
-        int dimension = nbt.getInteger("dimension");
-        return new LoreKey(page, dimension);
+
+        return LoreKey.fromNBT(stack.getTagCompound());
     }
 
     private IIcon icon;
@@ -71,10 +68,9 @@ public class ItemLorePage extends Item {
                     }
 
                     PlayerHandler.getCollectedLore(player).addLore(key);
-
                     PacketSyncLore.updateLore((EntityPlayerMP) player);
 
-                    player.addChatComponentMessage(new ChatComponentText("Added lore page #" + data.page));
+                    player.addChatComponentMessage(new ChatComponentText(String.format("Added lore page '%s'", key.ident)));
                 }
             }
         }
@@ -94,12 +90,8 @@ public class ItemLorePage extends Item {
             }
 
             if (data != null) {
-                list.add(String.format("Page %s: %s", key.page, data.title));
-                if (key.dimension == Integer.MAX_VALUE) {
-                    list.add("Global");
-                } else {
-                    list.add("Dimension: " + DimensionManager.getProvider(data.dimension).getDimensionName());
-                }
+                list.add(String.format("Title: %s", data.title));
+                list.add(String.format("Category: %s", data.category));
             }
         }
     }
@@ -109,7 +101,7 @@ public class ItemLorePage extends Item {
         for (Lore data : LoreLoader.getAllLore()) {
             if (data != null) {
                 ItemStack stack = new ItemStack(this);
-                ItemLorePage.setLore(stack, new LoreKey(data));
+                ItemLorePage.setLore(stack, LoreKey.fromLore(data));
                 list.add(stack);
             }
         }
