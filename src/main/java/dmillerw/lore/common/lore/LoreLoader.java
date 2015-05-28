@@ -81,7 +81,7 @@ public class LoreLoader {
         return lore.values().toArray(new Lore[lore.size()]);
     }
 
-    private String getDimensionName(int dimension) {
+    public String getDimensionName(int dimension) {
         try {
             if (dimensionNameCache.containsKey(dimension)) {
                 return dimensionNameCache.get(dimension);

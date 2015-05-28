@@ -17,7 +17,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
 
 import java.util.List;
 
@@ -98,25 +97,9 @@ public class ItemLorePage extends Item {
                 if (key.dimension == Integer.MAX_VALUE) {
                     list.add("Global");
                 } else {
-                    list.add("Dimension: " + DimensionManager.getProvider(data.dimension).getDimensionName());
+                    list.add("Dimension: " + LoreLoader.INSTANCE.getDimensionName(key.dimension));
                 }
             }
-        }
-    }
-
-    @Override
-    public String getItemStackDisplayName(ItemStack stack) {
-        LoreKey key = ItemLorePage.getLore(stack);
-        if (key != null) {
-            Lore data = LoreLoader.INSTANCE.getLore(key);
-
-            if (data != null) {
-                return "Lore: " + data.title;
-            } else {
-                return super.getItemStackDisplayName(stack);
-            }
-        } else {
-            return super.getItemStackDisplayName(stack);
         }
     }
 
