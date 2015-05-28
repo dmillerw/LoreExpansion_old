@@ -105,6 +105,22 @@ public class ItemLorePage extends Item {
     }
 
     @Override
+    public String getItemStackDisplayName(ItemStack stack) {
+        LoreKey key = ItemLorePage.getLore(stack);
+        if (key != null) {
+            Lore data = LoreLoader.INSTANCE.getLore(key);
+
+            if (data != null) {
+                return "Lore: " + data.title;
+            } else {
+                return super.getItemStackDisplayName(stack);
+            }
+        } else {
+            return super.getItemStackDisplayName(stack);
+        }
+    }
+
+    @Override
     public void getSubItems(Item item, CreativeTabs tab, List list) {
         for (Lore data : LoreLoader.INSTANCE.getAllLore()) {
             if (data != null) {
