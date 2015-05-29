@@ -85,6 +85,7 @@ public class GuiJournal extends GuiScreen {
     public static List<LoreKey> playerLore = Lists.newArrayList();
     public static LoreKey selectedLore;
 
+    private static int categoryIndex;
     private static String currentCategory;
 
     private static Lore currentLore;
@@ -93,7 +94,7 @@ public class GuiJournal extends GuiScreen {
     @Override
     public void initGui() {
         if (selectedLore != null) {
-            currentCategory = selectedLore.category;
+            changeCategory(selectedLore.category);
             changeLore(selectedLore);
             ClientProxy.pickedUpPage = null;
         } else {
@@ -117,7 +118,7 @@ public class GuiJournal extends GuiScreen {
             }
         }
 
-        Set<Lore> all = LoreLoader.getAllLoreForCategory(Lore.GLOBAL);
+        Set<Lore> all = LoreLoader.getAllLoreForCategory(currentCategory);
 
         // BACKGROUND
         GL11.glColor4f(1, 1, 1, 1);
@@ -233,6 +234,9 @@ public class GuiJournal extends GuiScreen {
         index = 1;
         for (Lore lore : all) {
             if (lore != null) {
+                if (!playerLore.contains(LoreKey.fromLore(lore)))
+                    continue;
+
                 mc.getTextureManager().bindTexture(JOURNAL_RIGHT);
 
                 int page = Math.min(index, 35);
@@ -268,12 +272,14 @@ public class GuiJournal extends GuiScreen {
             }
         }
 
-        Set<Lore> all = LoreLoader.getAllLoreForCategory(Lore.GLOBAL);
+        Set<Lore> all = LoreLoader.getAllLoreForCategory(currentCategory);
 
         int index = 1;
         for (Lore lore : all) {
             if (lore != null) {
-//				int page = lore.page - (4 * loreScrollIndex);
+				if (!playerLore.contains(LoreKey.fromLore(lore)))
+                    continue;
+
                 int page = Math.min(index, 35);
 
                 index++;
@@ -324,45 +330,44 @@ public class GuiJournal extends GuiScreen {
             }
         }
 
-        /*// ARROWS - DIMENSION
+        // ARROWS - DIMENSION
         if (inBounds(left + TAB_BACK.left, top + TAB_BACK.right, TAB_SIZE.left, TAB_SIZE.right, x, y)) {
-            int lastIndex = dimensionIndex;
-            if (dimensionIndex <= 0) {
-                dimensionIndex = dimensions.length - 1;
-            } else {
-                dimensionIndex--;
-            }
-
-            if (lastIndex != dimensionIndex) {
-                reset();
-            }
+            changeCategory(categoryIndex - 1, true);
         }
 
         if (inBounds(left + TAB_FORWARD.left, top + TAB_FORWARD.right, TAB_SIZE.left, TAB_SIZE.right, x, y)) {
-            int lastIndex = dimensionIndex;
-            if (dimensionIndex >= dimensions.length - 1) {
-                dimensionIndex = 0;
-            } else {
-                dimensionIndex++;
-            }
-
-            if (lastIndex != dimensionIndex) {
-                reset();
-            }
-        }*/
+            changeCategory(categoryIndex + 1, false);
+        }
     }
 
     public void reset() {
-        int max = LoreLoader.getAllLoreForCategory(currentCategory).size();
-        maxPage = max;
+        maxPage = LoreLoader.getAllLoreForCategory(currentCategory).size();
         selectedLore = null;
         textScrollIndex = 0;
         currentLoreText.clear();
         SoundHandler.INSTANCE.stop();
     }
 
-    public void changeCategory(String category) {
+    public void changeCategory(int index, boolean back) {
+        final int max = LoreLoader.getAllCategories().size() - 1;
 
+        categoryIndex = index;
+        if (categoryIndex < 0) categoryIndex = max;
+        if (categoryIndex > max) categoryIndex = 0;
+
+        currentCategory = LoreLoader.getAllCategories().get(categoryIndex);
+
+        System.out.println(LoreLoader.getAllCategories());
+        System.out.println(currentCategory + " " + categoryIndex);
+
+        reset();
+    }
+
+    public void changeCategory(String category) {
+        currentCategory = category;
+        categoryIndex = LoreLoader.getAllCategories().indexOf(currentCategory);
+
+        reset();
     }
 
     public void changeLore(LoreKey key) {

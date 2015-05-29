@@ -20,6 +20,9 @@ import java.util.*;
 public class LoreLoader {
 
     public static void initialize() {
+        // Forces GLOBAL to be the first category
+        categories.add(Lore.GLOBAL);
+
         for (File file : LoreExpansion.loreFolder.listFiles(ExtensionFilter.JSON)) {
             try {
                 LoreLoader.loadLore(file);
@@ -49,10 +52,15 @@ public class LoreLoader {
 
             loreMap.put(category, newMap);
         }
+
+        Collections.sort(categories);
     }
 
     public static void loadLore(File file) throws Exception {
         Lore lore = JsonUtil.gson().fromJson(new FileReader(file), Lore.class);
+
+        if (!categories.contains(lore.category))
+            categories.add(lore.category);
 
         lore.ident = FilenameUtils.getBaseName(file.getName());
 
@@ -70,6 +78,7 @@ public class LoreLoader {
         loreMap.put(lore.category, submap);
     }
 
+    private static LinkedList<String> categories = Lists.newLinkedList();
     private static Map<String, LinkedHashMap<String, Lore>> loreMap = Maps.newHashMap();
 
     private static LinkedHashMap<String, Lore> getMap(String category) {
@@ -81,8 +90,8 @@ public class LoreLoader {
         return map;
     }
 
-    public static Set<String> getAllCategories() {
-        return loreMap.keySet();
+    public static List<String> getAllCategories() {
+        return categories;
     }
 
     public static ImmutableSet<Lore> getAllLore() {
