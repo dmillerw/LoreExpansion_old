@@ -1,6 +1,7 @@
 package dmillerw.lore.client.gui;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import dmillerw.lore.ClientProxy;
 import dmillerw.lore.LoreExpansion;
 import dmillerw.lore.client.sound.SoundHandler;
@@ -18,10 +19,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author dmillerw
@@ -84,6 +82,8 @@ public class GuiJournal extends GuiScreen {
 
     public static List<LoreKey> playerLore = Lists.newArrayList();
     public static LoreKey selectedLore;
+
+    private static Map<String, String> prettyCatCache = Maps.newHashMap();
 
     private static int categoryIndex;
     private static String currentCategory;
@@ -219,7 +219,13 @@ public class GuiJournal extends GuiScreen {
 //		}
 
         // TEXT - LEFT
-        //TODO Top tag
+        String pretty = prettyCatCache.get(currentCategory);
+        if (pretty == null) {
+            pretty = StringHelper.pretty(currentCategory);
+            prettyCatCache.put(currentCategory, pretty);
+        }
+
+        drawCenteredString(pretty, (left + (LEFT_SIZE.left - 8) / 2) + 8, top + TITLE_Y, 0x000000);
 
         // TEXT - RIGHT
         if (current != null) {
@@ -256,6 +262,15 @@ public class GuiJournal extends GuiScreen {
                     }
                 }
             }
+        }
+
+        // ARROWS - DIMENSION
+        if (inBounds(left + TAB_BACK.left, top + TAB_BACK.right, TAB_SIZE.left, TAB_SIZE.right, x, y)) {
+            drawHoveringText(Collections.singletonList("Previous Category"), x, y, mc.fontRenderer);
+        }
+
+        if (inBounds(left + TAB_FORWARD.left, top + TAB_FORWARD.right, TAB_SIZE.left, TAB_SIZE.right, x, y)) {
+            drawHoveringText(Collections.singletonList("Next Category"), x, y, mc.fontRenderer);
         }
     }
 
