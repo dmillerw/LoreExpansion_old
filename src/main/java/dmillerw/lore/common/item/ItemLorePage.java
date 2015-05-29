@@ -29,9 +29,9 @@ public class ItemLorePage extends Item {
         if (!stack.hasTagCompound()) {
             stack.setTagCompound(new NBTTagCompound());
         }
+
         NBTTagCompound nbt = stack.getTagCompound();
-        nbt.setInteger("page", key.page);
-        nbt.setInteger("dimension", key.dimension);
+        key.writeToNBT(nbt);
         stack.setTagCompound(nbt);
     }
 
@@ -39,10 +39,8 @@ public class ItemLorePage extends Item {
         if (!stack.hasTagCompound()) {
             return null;
         }
-        NBTTagCompound nbt = stack.getTagCompound();
-        int page = nbt.getInteger("page");
-        int dimension = nbt.getInteger("dimension");
-        return new LoreKey(page, dimension);
+
+        return LoreKey.fromNBT(stack.getTagCompound());
     }
 
     private IIcon icon;
@@ -62,7 +60,7 @@ public class ItemLorePage extends Item {
             if (player.capabilities.isCreativeMode) {
                 LoreKey key = ItemLorePage.getLore(stack);
                 if (key != null) {
-                    Lore data = LoreLoader.INSTANCE.getLore(key);
+                    Lore data = LoreLoader.getLore(key);
 
                     if (data == null) {
                         LoreExpansion.logger.warn("Found item with invalid lore. Resetting");
@@ -70,10 +68,9 @@ public class ItemLorePage extends Item {
                     }
 
                     PlayerHandler.getCollectedLore(player).addLore(key);
-
                     PacketSyncLore.updateLore((EntityPlayerMP) player);
 
-                    player.addChatComponentMessage(new ChatComponentText("Added lore page #" + data.page));
+                    player.addChatComponentMessage(new ChatComponentText(String.format("Added lore page '%s'", key.ident)));
                 }
             }
         }
@@ -85,7 +82,7 @@ public class ItemLorePage extends Item {
     public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean debug) {
         LoreKey key = ItemLorePage.getLore(stack);
         if (key != null) {
-            Lore data = LoreLoader.INSTANCE.getLore(key);
+            Lore data = LoreLoader.getLore(key);
 
             if (data == null) {
                 LoreExpansion.logger.warn("Found item with invalid lore. Resetting");
@@ -93,22 +90,18 @@ public class ItemLorePage extends Item {
             }
 
             if (data != null) {
-                list.add(String.format("Page %s: %s", key.page, data.title));
-                if (key.dimension == Integer.MAX_VALUE) {
-                    list.add("Global");
-                } else {
-                    list.add("Dimension: " + LoreLoader.INSTANCE.getDimensionName(key.dimension));
-                }
+                list.add(String.format("Title: %s", data.title));
+                list.add(String.format("Category: %s", data.category));
             }
         }
     }
 
     @Override
     public void getSubItems(Item item, CreativeTabs tab, List list) {
-        for (Lore data : LoreLoader.INSTANCE.getAllLore()) {
+        for (Lore data : LoreLoader.getAllLore()) {
             if (data != null) {
                 ItemStack stack = new ItemStack(this);
-                ItemLorePage.setLore(stack, new LoreKey(data));
+                ItemLorePage.setLore(stack, LoreKey.fromLore(data));
                 list.add(stack);
             }
         }

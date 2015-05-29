@@ -1,4 +1,4 @@
-package dmillerw.lore.common.misc;
+package dmillerw.lore.common.lib;
 
 /**
  * @author dmillerw

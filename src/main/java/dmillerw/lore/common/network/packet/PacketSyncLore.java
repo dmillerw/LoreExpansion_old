@@ -1,5 +1,6 @@
 package dmillerw.lore.common.network.packet;
 
+import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
@@ -19,7 +20,7 @@ import java.util.List;
 /**
  * @author dmillerw
  */
-public class PacketSyncLore implements IMessage, IMessageHandler<PacketSyncLore, IMessage> {
+public class PacketSyncLore implements IMessage {
 
     public static void updateLore(EntityPlayerMP player) {
         PacketHandler.INSTANCE.sendTo(new PacketSyncLore(player), player);
@@ -42,13 +43,8 @@ public class PacketSyncLore implements IMessage, IMessageHandler<PacketSyncLore,
             for (int i = 0; i < lore.size(); i++) {
                 LoreKey key = lore.get(i);
 
-                buf.writeInt(key.page);
-                if (key.dimension == Integer.MAX_VALUE) {
-                    buf.writeBoolean(false);
-                } else {
-                    buf.writeBoolean(true);
-                    buf.writeInt(key.dimension);
-                }
+                ByteBufUtils.writeUTF8String(buf, key.category);
+                ByteBufUtils.writeUTF8String(buf, key.ident);
             }
         }
     }
@@ -58,27 +54,28 @@ public class PacketSyncLore implements IMessage, IMessageHandler<PacketSyncLore,
         lore = new ArrayList<LoreKey>();
         int size = buf.readInt();
         for (int i = 0; i < size; i++) {
-            int page = buf.readInt();
-            int dimension = Integer.MAX_VALUE;
-            if (buf.readBoolean()) {
-                dimension = buf.readInt();
-            }
-            lore.add(new LoreKey(page, dimension));
+            lore.add(new LoreKey(ByteBufUtils.readUTF8String(buf), ByteBufUtils.readUTF8String(buf)));
         }
     }
 
-    @Override
-    public IMessage onMessage(PacketSyncLore message, MessageContext ctx) {
-        World world = LoreExpansion.proxy.getClientWorld();
-        if (world == null) {
+    public static class Handler implements IMessageHandler<PacketSyncLore, IMessage> {
+
+        @Override
+        public IMessage onMessage(PacketSyncLore message, MessageContext ctx) {
+            World world = LoreExpansion.proxy.getClientWorld();
+            if (world == null) {
+                return null;
+            }
+
+            GuiJournal.playerLore.clear();
+            GuiJournal.playerLore = message.lore;
+
+            if (!GuiJournal.playerLore.contains(GuiJournal.selectedLore)) {
+                GuiJournal.selectedLore = null;
+                SoundHandler.INSTANCE.stop(); // Just in case
+            }
+
             return null;
         }
-        GuiJournal.playerLore.clear();
-        GuiJournal.playerLore = message.lore;
-        if (!GuiJournal.playerLore.contains(GuiJournal.selectedLore)) {
-            GuiJournal.selectedLore = null;
-            SoundHandler.INSTANCE.stop(); // Just in case
-        }
-        return null;
     }
 }
