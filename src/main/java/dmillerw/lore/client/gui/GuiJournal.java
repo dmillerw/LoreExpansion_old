@@ -93,13 +93,13 @@ public class GuiJournal extends GuiScreen {
 
     @Override
     public void initGui() {
-        if (selectedLore != null) {
+        /*if (selectedLore != null) {
             changeCategory(selectedLore.category);
             changeLore(selectedLore);
             ClientProxy.pickedUpPage = null;
-        } else {
+        } else {*/
             changeCategory(Lore.GLOBAL);
-        }
+//        }
     }
 
     @Override
@@ -240,8 +240,10 @@ public class GuiJournal extends GuiScreen {
         index = 1;
         for (Lore lore : all) {
             if (lore != null) {
-                if (!playerLore.contains(LoreKey.fromLore(lore)))
+                if (!playerLore.contains(LoreKey.fromLore(lore))) {
+                    index++;
                     continue;
+                }
 
                 mc.getTextureManager().bindTexture(JOURNAL_RIGHT);
 
@@ -292,8 +294,10 @@ public class GuiJournal extends GuiScreen {
         int index = 1;
         for (Lore lore : all) {
             if (lore != null) {
-				if (!playerLore.contains(LoreKey.fromLore(lore)))
+                if (!playerLore.contains(LoreKey.fromLore(lore))) {
+                    index++;
                     continue;
+                }
 
                 int page = Math.min(index, 35);
 
