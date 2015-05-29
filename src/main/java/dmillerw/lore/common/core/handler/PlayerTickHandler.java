@@ -63,13 +63,15 @@ public class PlayerTickHandler {
                                     PacketNotification.notify(event.player, PacketNotification.TYPE_CLIENT_AUTOPLAY, key);
                                 }
 
-                                for (Commands.CommandEntry command : lore.commands.commands) {
-                                    if (command.delay > 0) {
-                                        CommandDelayHandler.queueCommand(event.player, command);
-                                    } else {
-                                        CommandHandler ch = (CommandHandler) MinecraftServer.getServer().getCommandManager();
-                                        LoreCommandSender commandSender = new LoreCommandSender(event.player);
-                                        ch.executeCommand(commandSender, command.command);
+                                if (lore.commands.commands != null) {
+                                    for (Commands.CommandEntry command : lore.commands.commands) {
+                                        if (command.delay > 0) {
+                                            CommandDelayHandler.queueCommand(event.player, command);
+                                        } else {
+                                            CommandHandler ch = (CommandHandler) MinecraftServer.getServer().getCommandManager();
+                                            LoreCommandSender commandSender = new LoreCommandSender(event.player);
+                                            ch.executeCommand(commandSender, command.command);
+                                        }
                                     }
                                 }
                             }
