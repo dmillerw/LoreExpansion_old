@@ -34,6 +34,10 @@ public class LoreKey {
         nbt.setString("ident", ident);
     }
 
+    public boolean isLore(Lore lore) {
+        return lore.ident.equals(ident) && lore.category.equals(category);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

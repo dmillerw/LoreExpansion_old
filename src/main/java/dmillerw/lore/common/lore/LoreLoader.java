@@ -1,6 +1,7 @@
 package dmillerw.lore.common.lore;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import dmillerw.lore.LoreExpansion;
 import dmillerw.lore.common.lib.ExtensionFilter;
@@ -11,8 +12,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.FileReader;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author dmillerw
@@ -27,6 +27,27 @@ public class LoreLoader {
                 LoreExpansion.logger.warn(String.format("Failed to parse %s", file.getName()));
                 ex.printStackTrace();
             }
+        }
+
+        // Sort
+        for (String category : getAllCategories()) {
+            LinkedList<Lore> loreList = Lists.newLinkedList();
+            loreList.addAll(getMap(category).values());
+            Collections.sort(loreList, new Comparator<Lore>() {
+                @Override
+                public int compare(Lore o1, Lore o2) {
+                    int compare = Integer.compare(o1.sortingIndex, o2.sortingIndex);
+                    return compare == 0 ? compare : o1.title.compareTo(o2.title);
+                }
+            });
+
+            LinkedHashMap<String, Lore> newMap = Maps.newLinkedHashMap();
+
+            for (Lore lore :loreList) {
+                newMap.put(lore.ident, lore);
+            }
+
+            loreMap.put(category, newMap);
         }
     }
 
@@ -58,6 +79,10 @@ public class LoreLoader {
             loreMap.put(category, map);
         }
         return map;
+    }
+
+    public static Set<String> getAllCategories() {
+        return loreMap.keySet();
     }
 
     public static ImmutableSet<Lore> getAllLore() {

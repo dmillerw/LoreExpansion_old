@@ -1,5 +1,7 @@
 package dmillerw.lore.common.lore.data;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * @author dmillerw
  */
@@ -12,6 +14,9 @@ public class Lore {
     public String title = "";
     public String body = "";
     public String sound = "";
+
+    @SerializedName("sorting_index")
+    public int sortingIndex = 0;
 
     public Commands commands = Commands.BLANK;
 
