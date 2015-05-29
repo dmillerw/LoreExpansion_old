@@ -357,9 +357,6 @@ public class GuiJournal extends GuiScreen {
 
         currentCategory = LoreLoader.getAllCategories().get(categoryIndex);
 
-        System.out.println(LoreLoader.getAllCategories());
-        System.out.println(currentCategory + " " + categoryIndex);
-
         reset();
     }
 
