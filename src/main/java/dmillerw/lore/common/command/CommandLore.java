@@ -5,7 +5,9 @@ import dmillerw.lore.LoreExpansion;
 import dmillerw.lore.common.item.ItemLorePage;
 import dmillerw.lore.common.lore.LoreLoader;
 import dmillerw.lore.common.lore.PlayerHandler;
+import dmillerw.lore.common.lore.data.Lore;
 import dmillerw.lore.common.lore.data.LoreKey;
+import dmillerw.lore.common.lore.data.entity.LoreProperties;
 import dmillerw.lore.common.network.packet.PacketSyncLore;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
@@ -18,6 +20,7 @@ import net.minecraft.util.EnumChatFormatting;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author dmillerw
@@ -67,6 +70,19 @@ public class CommandLore extends CommandBase {
                         confirmationMap.remove(player.getCommandSenderName());
                     }
                 }
+            }
+        } else if (args.length == 2) {
+            if (args[0].equals("give") && args[1].equals("all")) {
+                Set<Lore> lores = LoreLoader.getAllLore();
+                for (Lore lore : lores) {
+                    final LoreKey key = LoreKey.fromLore(lore);
+
+                    LoreProperties properties = PlayerHandler.getCollectedLore((EntityPlayer) sender);
+                    if (!properties.hasLore(key))
+                        properties.addLore(key);
+                }
+
+                PacketSyncLore.updateLore((EntityPlayerMP) sender);
             }
         } else if (args.length == 3) {
             if (args[0].equals("give")) {

@@ -39,8 +39,7 @@ public class LoreLoader {
             Collections.sort(loreList, new Comparator<Lore>() {
                 @Override
                 public int compare(Lore o1, Lore o2) {
-                    int compare = Integer.compare(o1.sortingIndex, o2.sortingIndex);
-                    return compare == 0 ? compare : o1.title.compareTo(o2.title);
+                    return Integer.compare(o1.sortingIndex, o2.sortingIndex);
                 }
             });
 
