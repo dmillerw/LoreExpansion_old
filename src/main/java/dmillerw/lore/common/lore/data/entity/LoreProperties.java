@@ -43,7 +43,7 @@ public class LoreProperties implements IExtendedEntityProperties {
         for (LoreKey key : collectedLore) {
             NBTTagCompound tag = new NBTTagCompound();
             key.writeToNBT(tag);
-            if (autoplayed.contains(tag)) {
+            if (autoplayed.contains(key)) {
                 tag.setBoolean("played", true);
             }
             list.appendTag(tag);
