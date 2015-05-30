@@ -3,9 +3,9 @@ package dmillerw.lore.common.lore.data.json;
 import com.google.common.collect.Lists;
 import com.google.gson.*;
 import dmillerw.lore.common.lore.data.Commands;
-import scala.actors.threadpool.Arrays;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.List;
 
 public class CommandDeserializer implements JsonDeserializer<Commands> {
