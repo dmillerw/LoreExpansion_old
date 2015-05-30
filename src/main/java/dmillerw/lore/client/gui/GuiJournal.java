@@ -89,17 +89,20 @@ public class GuiJournal extends GuiScreen {
     private static String currentCategory;
 
     private static Lore currentLore;
-    private List<String> currentLoreText = new ArrayList<String>();
+    private List<String> currentLoreText = Lists.newArrayList();
 
     @Override
     public void initGui() {
-        /*if (selectedLore != null) {
+        if (selectedLore != null) {
+            LoreKey copy = selectedLore.copy();
             changeCategory(selectedLore.category);
-            changeLore(selectedLore);
+            changeLore(copy);
             ClientProxy.pickedUpPage = null;
-        } else {*/
-            changeCategory(Lore.GLOBAL);
-//        }
+        } else {
+            if (currentCategory == null || currentCategory.isEmpty()) {
+                changeCategory(Lore.GLOBAL);
+            }
+        }
     }
 
     @Override
@@ -109,6 +112,7 @@ public class GuiJournal extends GuiScreen {
         // VARIABLES
         int left = (width - TOTAL_SIZE.left) / 2;
         int top = (height - TOTAL_SIZE.right) / 2;
+
         Lore current = null;
         if (selectedLore != null) {
             current = LoreLoader.getLore(selectedLore);
@@ -278,8 +282,12 @@ public class GuiJournal extends GuiScreen {
 
     @Override
     protected void mouseClicked(int x, int y, int button) {
+        if (button != 0)
+            return;
+
         int left = (width - TOTAL_SIZE.left) / 2;
         int top = (height - TOTAL_SIZE.right) / 2;
+
         Lore current = null;
         if (selectedLore != null) {
             current = LoreLoader.getLore(selectedLore);
@@ -351,11 +359,11 @@ public class GuiJournal extends GuiScreen {
 
         // ARROWS - DIMENSION
         if (inBounds(left + TAB_BACK.left, top + TAB_BACK.right, TAB_SIZE.left, TAB_SIZE.right, x, y)) {
-            changeCategory(categoryIndex - 1, true);
+            changeCategory(categoryIndex - 1);
         }
 
         if (inBounds(left + TAB_FORWARD.left, top + TAB_FORWARD.right, TAB_SIZE.left, TAB_SIZE.right, x, y)) {
-            changeCategory(categoryIndex + 1, false);
+            changeCategory(categoryIndex + 1);
         }
     }
 
@@ -367,16 +375,18 @@ public class GuiJournal extends GuiScreen {
         SoundHandler.INSTANCE.stop();
     }
 
-    public void changeCategory(int index, boolean back) {
+    public void changeCategory(int index) {
         final int max = LoreLoader.getAllCategories().size() - 1;
 
         categoryIndex = index;
         if (categoryIndex < 0) categoryIndex = max;
         if (categoryIndex > max) categoryIndex = 0;
 
-        currentCategory = LoreLoader.getAllCategories().get(categoryIndex);
-
-        reset();
+        String cat = LoreLoader.getAllCategories().get(categoryIndex);
+        if (currentCategory == null || !currentCategory.equals(cat)) {
+            currentCategory = cat;
+            reset();
+        }
     }
 
     public void changeCategory(String category) {

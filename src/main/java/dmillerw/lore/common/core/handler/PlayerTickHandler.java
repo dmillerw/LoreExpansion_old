@@ -17,7 +17,6 @@ import dmillerw.lore.common.network.packet.PacketSyncLore;
 import net.minecraft.command.CommandHandler;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 
 /**
@@ -40,8 +39,6 @@ public class PlayerTickHandler {
                             Lore lore = LoreLoader.getLore(key);
 
                             if (lore == null) {
-                                LoreExpansion.logger.warn("Found item with invalid lore. Resetting");
-                                stack.setTagCompound(new NBTTagCompound());
                                 return;
                             }
 

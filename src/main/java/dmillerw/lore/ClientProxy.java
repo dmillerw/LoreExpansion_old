@@ -51,23 +51,27 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void handleNotificationPacket(PacketNotification packet, MessageContext context) {
-        LoreKey key = packet.key;
+        Lore lore = LoreLoader.getLore(packet.key);
+        if (lore == null) {
+            LoreExpansion.logger.warn("Received a notification packet from the server involving an unknown piece of lore");
+            LoreExpansion.logger.warn("Ensure your configs and lore files match up with the server you're connected to!");
+            return;
+        }
+
         if (packet.type == PacketNotification.TYPE_CLIENT_PICKUP) {
-            ClientProxy.pickedUpPage = key.copy();
-            if (LoreLoader.getLore(key).notify) {
+            ClientProxy.pickedUpPage = packet.key.copy();
+            if (lore.notify) {
                 Minecraft.getMinecraft().thePlayer.addChatComponentMessage(new ChatComponentText("You've discovered a new lore page. Press " + Keyboard.getKeyName(KeyHandler.INSTANCE.key.getKeyCode()) + " to view"));
             }
-//			PacketHandler.INSTANCE.sendToServer(new PacketServerNotification(key.page, key.dimension, PacketServerNotification.CONFIRM_AUTOPLAY));
         }
 
         if (packet.type == PacketNotification.TYPE_CLIENT_AUTOPLAY) {
-            Lore lore = LoreLoader.getLore(key);
             if (!lore.sound.isEmpty()) {
                 SoundHandler.INSTANCE.play(lore.sound);
 
                 // I feel like autoplaying lore should immediately be viewable in the journal, regardless
                 // of whether or not they opened it via keybind.
-                GuiJournal.selectedLore = key.copy();
+                GuiJournal.selectedLore = packet.key.copy();
                 ClientProxy.pickedUpPage = null;
             }
         }

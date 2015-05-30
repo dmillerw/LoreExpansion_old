@@ -1,6 +1,5 @@
 package dmillerw.lore.common.item;
 
-import dmillerw.lore.LoreExpansion;
 import dmillerw.lore.common.core.TabLore;
 import dmillerw.lore.common.lore.LoreLoader;
 import dmillerw.lore.common.lore.PlayerHandler;
@@ -62,15 +61,12 @@ public class ItemLorePage extends Item {
                 if (key != null) {
                     Lore data = LoreLoader.getLore(key);
 
-                    if (data == null) {
-                        LoreExpansion.logger.warn("Found item with invalid lore. Resetting");
-                        stack.setTagCompound(new NBTTagCompound());
+                    if (data != null) {
+                        PlayerHandler.getCollectedLore(player).addLore(key);
+                        PacketSyncLore.updateLore((EntityPlayerMP) player);
+
+                        player.addChatComponentMessage(new ChatComponentText(String.format("Added lore page '%s'", key.ident)));
                     }
-
-                    PlayerHandler.getCollectedLore(player).addLore(key);
-                    PacketSyncLore.updateLore((EntityPlayerMP) player);
-
-                    player.addChatComponentMessage(new ChatComponentText(String.format("Added lore page '%s'", key.ident)));
                 }
             }
         }
@@ -83,11 +79,6 @@ public class ItemLorePage extends Item {
         LoreKey key = ItemLorePage.getLore(stack);
         if (key != null) {
             Lore data = LoreLoader.getLore(key);
-
-            if (data == null) {
-                LoreExpansion.logger.warn("Found item with invalid lore. Resetting");
-                stack.setTagCompound(new NBTTagCompound());
-            }
 
             if (data != null) {
                 list.add(String.format("Title: %s", data.title));
