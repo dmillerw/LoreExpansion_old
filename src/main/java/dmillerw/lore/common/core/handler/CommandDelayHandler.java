@@ -17,7 +17,7 @@ public class CommandDelayHandler {
 
     private static class DelayedCommand {
 
-        public String command;
+        public String[] commands;
         public int timer;
 
         private WeakReference<EntityPlayer> player;
@@ -35,7 +35,7 @@ public class CommandDelayHandler {
 
     public static void queueCommand(EntityPlayer entityPlayer, Commands.CommandEntry commandEntry) {
         DelayedCommand delayedCommand = new DelayedCommand();
-        delayedCommand.command = commandEntry.command;
+        delayedCommand.commands = commandEntry.commands;
         delayedCommand.timer = commandEntry.delay;
         delayedCommand.setPlayer(entityPlayer);
         delayedCommands.add(delayedCommand);
@@ -55,7 +55,9 @@ public class CommandDelayHandler {
                 CommandHandler ch = (CommandHandler) MinecraftServer.getServer().getCommandManager();
                 LoreCommandSender commandSender = new LoreCommandSender(delayedCommand.getPlayer());
 
-                ch.executeCommand(commandSender, delayedCommand.command);
+                for (String command : delayedCommand.commands) {
+                    ch.executeCommand(commandSender, command);
+                }
 
                 delayedIterator.remove();
             }

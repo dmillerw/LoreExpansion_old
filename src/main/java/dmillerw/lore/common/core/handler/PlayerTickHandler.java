@@ -56,7 +56,6 @@ public class PlayerTickHandler {
                                 PacketNotification.notify(event.player, PacketNotification.TYPE_CLIENT_PICKUP, key);
 
                                 // Autoplay handling
-
                                 LoreProperties properties = PlayerHandler.getCollectedLore(event.player);
                                 if (lore.autoplay && properties.canAutoplay(key)) {
                                     properties.setAutoplayed(key, true);
@@ -70,7 +69,9 @@ public class PlayerTickHandler {
                                         } else {
                                             CommandHandler ch = (CommandHandler) MinecraftServer.getServer().getCommandManager();
                                             LoreCommandSender commandSender = new LoreCommandSender(event.player);
-                                            ch.executeCommand(commandSender, command.command);
+                                            for (String c : command.commands) {
+                                                ch.executeCommand(commandSender, c);
+                                            }
                                         }
                                     }
                                 }

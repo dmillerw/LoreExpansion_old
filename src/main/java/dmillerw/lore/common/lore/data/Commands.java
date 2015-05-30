@@ -8,15 +8,15 @@ public class Commands {
 
     public static class CommandEntry {
 
-        public String command = "";
+        public String[] commands = new String[0];
         public int delay = 0;
 
         public CommandEntry() {
 
         }
 
-        public CommandEntry(String command, int delay) {
-            this.command = command;
+        public CommandEntry(String[] commands, int delay) {
+            this.commands = commands;
             this.delay = delay;
         }
     }
