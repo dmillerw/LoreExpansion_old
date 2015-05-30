@@ -134,7 +134,7 @@ public class GuiJournal extends GuiScreen {
         // LORE DRAWING
         int index = 1;
         for (Lore lore : all) {
-            if (lore != null) {
+            if (lore != null && !lore.hidden) {
                 mc.getTextureManager().bindTexture(JOURNAL_RIGHT);
 
                 int page = Math.min(index, 35);
@@ -243,7 +243,7 @@ public class GuiJournal extends GuiScreen {
         // TOOLTIPS - They affect lighting, so happen at the end
         index = 1;
         for (Lore lore : all) {
-            if (lore != null) {
+            if (lore != null && !lore.hidden) {
                 if (!playerLore.contains(LoreKey.fromLore(lore))) {
                     index++;
                     continue;
@@ -301,7 +301,7 @@ public class GuiJournal extends GuiScreen {
 
         int index = 1;
         for (Lore lore : all) {
-            if (lore != null) {
+            if (lore != null && !lore.hidden) {
                 if (!playerLore.contains(LoreKey.fromLore(lore))) {
                     index++;
                     continue;

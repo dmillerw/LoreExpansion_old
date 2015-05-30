@@ -22,8 +22,5 @@ public class Lore {
 
     public boolean autoplay = true;
     public boolean notify = true;
-
-    public boolean hasSound() {
-        return !sound.isEmpty();
-    }
+    public boolean hidden = false;
 }

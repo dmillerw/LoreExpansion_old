@@ -60,7 +60,7 @@ public class ClientProxy extends CommonProxy {
 
         if (packet.type == PacketNotification.TYPE_CLIENT_PICKUP) {
             ClientProxy.pickedUpPage = packet.key.copy();
-            if (lore.notify) {
+            if (!lore.hidden && lore.notify) {
                 Minecraft.getMinecraft().thePlayer.addChatComponentMessage(new ChatComponentText("You've discovered a new lore page. Press " + Keyboard.getKeyName(KeyHandler.INSTANCE.key.getKeyCode()) + " to view"));
             }
         }
@@ -69,10 +69,12 @@ public class ClientProxy extends CommonProxy {
             if (!lore.sound.isEmpty()) {
                 SoundHandler.INSTANCE.play(lore.sound);
 
-                // I feel like autoplaying lore should immediately be viewable in the journal, regardless
-                // of whether or not they opened it via keybind.
-                GuiJournal.selectedLore = packet.key.copy();
-                ClientProxy.pickedUpPage = null;
+                if (!lore.hidden) {
+                    // I feel like autoplaying lore should immediately be viewable in the journal, regardless
+                    // of whether or not they opened it via keybind.
+                    GuiJournal.selectedLore = packet.key.copy();
+                    ClientProxy.pickedUpPage = null;
+                }
             }
         }
     }
