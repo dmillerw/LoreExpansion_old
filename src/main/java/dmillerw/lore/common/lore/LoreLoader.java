@@ -3,6 +3,7 @@ package dmillerw.lore.common.lore;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import cpw.mods.fml.common.FMLCommonHandler;
 import dmillerw.lore.LoreExpansion;
 import dmillerw.lore.common.lib.ExtensionFilter;
 import dmillerw.lore.common.lib.JsonUtil;

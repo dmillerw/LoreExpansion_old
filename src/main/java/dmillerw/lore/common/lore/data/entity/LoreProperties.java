@@ -64,6 +64,10 @@ public class LoreProperties implements IExtendedEntityProperties {
         return collectedLore.contains(key);
     }
 
+    public void removeLore(LoreKey loreKey) {
+        collectedLore.remove(loreKey);
+    }
+
     public void addLore(LoreKey key) {
         collectedLore.add(key);
     }
