@@ -50,7 +50,7 @@ public class PacketNotification implements IMessage {
         @Override
         public IMessage onMessage(PacketNotification message, MessageContext ctx) {
             World clientWorld = LoreExpansion.proxy.getClientWorld();
-            if (clientWorld == null) {
+            if (clientWorld != null) {
                 if (message.type == TYPE_CLIENT_PICKUP || message.type == TYPE_CLIENT_AUTOPLAY) {
                     LoreExpansion.proxy.handleNotificationPacket(message, ctx);
                 }

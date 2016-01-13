@@ -12,7 +12,8 @@ import dmillerw.lore.common.lore.data.LoreKey;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 
 /**
@@ -57,7 +58,8 @@ public class LoreLoader {
     }
 
     public static void loadLore(File file) throws Exception {
-        Lore lore = JsonUtil.gson().fromJson(new FileReader(file), Lore.class);
+        Lore lore = JsonUtil.gson().fromJson(new InputStreamReader(
+                    new FileInputStream(file), "UTF-8"), Lore.class);
 
         if (!categories.contains(lore.category))
             categories.add(lore.category);
